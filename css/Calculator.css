@@ -1,110 +1,199 @@
+/* Calculator.css - Space Hologram Theme */
+
+:root {
+  --primary-color: #8b5cf6; /* 바이올렛 */
+  --glass-dark: rgba(15, 23, 42, 0.75); /* 본체 배경 */
+  --glass-light: rgba(255, 255, 255, 0.05); /* 버튼 배경 */
+  --text-light: #ffffff;
+  --accent-operator: linear-gradient(135deg, #8b5cf6, #6d28d9); /* 연산자 버튼 */
+  --accent-clear: linear-gradient(135deg, #ef4444, #b91c1c); /* C 버튼 */
+}
+
+/* 1. 전체 배경 (다른 페이지와 통일) */
 .calculator-page-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    background-color: #e0e5ec;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  /* 우주 배경 */
+  background-image: url("https://cdn.pixabay.com/photo/2016/11/29/05/45/astronomy-1867616_960_720.jpg");
+  background-size: cover;
+  background-position: center center;
+  background-attachment: fixed;
+  font-family: 'Pretendard', sans-serif;
+  padding: 20px;
+  box-sizing: border-box;
 }
 
+/* 2. 계산기 본체 (다크 글래스 카드) */
 .calculator-wrapper {
-    width: 100%;
-    max-width: 380px;
-    padding: 30px;
-    border-radius: 20px;
-    background: #e0e5ec;
-    box-shadow: 9px 9px 16px #a3b1c6, -9px -9px 16px #ffffff;
+  width: 100%;
+  max-width: 380px;
+  padding: 30px;
+  border-radius: 24px;
+  
+  /* 🚨 뉴모피즘 회색 제거 -> 다크 유리 적용 */
+  background: var(--glass-dark);
+  backdrop-filter: blur(15px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6); /* 깊은 그림자 */
+  
+  position: relative;
+  box-sizing: border-box;
 }
 
-/* 계산기 제목 스타일 */
+/* 3. 제목 */
 .calculator-title {
-    font-size: 1.5em;
-    margin: 0 0 25px 0; /* 제목과 디스플레이 영역 사이 간격 */
-    color: #555;
-    text-align: center; /* 제목을 가운데 정렬 */
+  font-size: 1.5em;
+  margin: 0 0 20px 0;
+  color: var(--text-light); /* 흰색 */
+  text-align: center;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-shadow: 0 2px 10px rgba(0,0,0,0.5);
 }
 
-/* 화면 우측 상단에 고정되는 '홈으로' 버튼 */
+/* 4. 홈으로 버튼 (우측 상단 고정) */
 .fixed-top-right {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    z-index: 1000; /* 다른 요소들 위에 표시 */
-    background-color: #007bff; /* 파란색 배경 */
-    color: white;
+  position: fixed;
+  top: 25px;
+  right: 25px;
+  z-index: 1000;
 }
 
 .back-button { 
-    background: #e0e5ec; /* 계산기 배경색과 동일하게 설정 */
-    border: none;
-    cursor: pointer;
-    font-size: 0.9em; /* 폰트 크기 조정 */
-    color: #555;
-    padding: 10px 15px; /* 패딩 조정 */
-    border-radius: 8px;
-    transition: all 0.2s ease-in-out;
-    font-weight: 600;
-    box-shadow: 5px 5px 10px #a3b1c6, -5px -5px 10px #ffffff; /* 기본 버튼과 유사한 그림자 */
+  /* 유리 버튼 스타일 유지하되, 크기 대폭 확대 */
+  background: rgba(255, 255, 255, 0.15); /* 배경을 좀 더 밝게 */
+  border: 2px solid rgba(255, 255, 255, 0.4); /* 테두리도 두껍게 */
+  color: #ffffff;
+  
+  /* 🚀 크기 키우기 핵심 */
+  font-size: 1.2rem;   /* 글씨 크기: 0.9rem -> 1.2rem */
+  padding: 15px 35px;  /* 버튼 크기: 넉넉하게 늘림 */
+  
+  border-radius: 50px; /* 완전 둥근 알약 모양 */
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 700;    /* 글씨 더 굵게 */
+  letter-spacing: 1px; /* 자간 넓혀서 시원하게 */
+  
+  /* 그림자 추가로 입체감 확보 */
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(8px);
 }
 
 .back-button:hover {
-    box-shadow: inset 3px 3px 6px #a3b1c6, inset -3px -3px 6px #ffffff; /* 눌리는 효과 */
+  background: rgba(255, 255, 255, 0.3);
+  transform: scale(1.1); /* 마우스 올리면 커지게 */
+  box-shadow: 0 8px 25px rgba(139, 92, 246, 0.5); /* 호버 시 보라색 광채 */
+  border-color: #ffffff;
 }
 
+/* 5. 디스플레이 영역 (LCD 화면 느낌) */
 .display-area {
-    width: 100%;
-    padding: 20px;
-    margin-bottom: 20px;
-    border-radius: 12px;
-    background: #e0e5ec;
-    box-shadow: inset 5px 5px 10px #a3b1c6, inset -5px -5px 10px #ffffff;
-    text-align: right;
-    word-wrap: break-word;
-    box-sizing: border-box;
+  width: 100%;
+  padding: 25px;
+  margin-bottom: 25px;
+  border-radius: 16px;
+  
+  /* 아주 어두운 배경으로 화면 강조 */
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: inset 0 2px 10px rgba(0,0,0,0.5); /* 안쪽 그림자 */
+  
+  text-align: right;
+  word-wrap: break-word;
+  box-sizing: border-box;
 }
 
 .input-display {
-    min-height: 30px;
-    font-size: 1.8em;
-    color: #888;
+  min-height: 30px;
+  font-size: 1.2em;
+  color: #94a3b8; /* 입력 과정은 회색 */
+  margin-bottom: 5px;
 }
 
 .result-display {
-    min-height: 40px;
-    font-size: 2.5em;
-    font-weight: bold;
-    color: #333;
+  min-height: 50px;
+  font-size: 2.8em;
+  font-weight: 700;
+  color: #ffffff; /* 결과는 밝은 흰색 */
+  text-shadow: 0 0 10px rgba(139, 92, 246, 0.5); /* 보라색 빛남 효과 */
 }
 
+/* 6. 버튼 그리드 */
 .button-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 15px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
 }
 
+/* 7. 버튼 공통 스타일 (유리 조각 느낌) */
 .calc-btn {
-    height: 70px;
-    border: none;
-    border-radius: 15px;
-    font-size: 1.5em;
-    cursor: pointer;
-    background: #e0e5ec;
-    box-shadow: 5px 5px 10px #a3b1c6, -5px -5px 10px #ffffff;
-    transition: all 0.1s ease-in-out;
-    color: #555;
+  height: 70px;
+  border-radius: 16px;
+  font-size: 1.5em;
+  cursor: pointer;
+  color: #e2e8f0;
+  font-weight: 600;
+  
+  /* 유리 스타일 */
+  background: var(--glass-light);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  
+  transition: all 0.1s ease-in-out;
+}
+
+.calc-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  transform: translateY(-2px);
 }
 
 .calc-btn:active {
-    box-shadow: inset 3px 3px 6px #a3b1c6, inset -3px -3px 6px #ffffff;
-    font-size: 1.45em;
+  transform: scale(0.95); /* 누르는 느낌 */
+  background: rgba(255, 255, 255, 0.05);
 }
 
+/* 8. 특수 버튼 스타일 */
+
+/* 연산자 (+, -, *, /) - 바이올렛 포인트 */
 .calc-btn.operator {
-    color: #ff6f61;
-    font-weight: bold;
+  background: var(--accent-operator);
+  color: white;
+  border: none;
+  box-shadow: 0 4px 10px rgba(139, 92, 246, 0.3);
+}
+.calc-btn.operator:hover {
+  box-shadow: 0 6px 15px rgba(139, 92, 246, 0.5);
+  filter: brightness(1.1);
 }
 
+/* 초기화 (C) - 붉은색 경고 포인트 */
 .calc-btn.clear {
-    color: #4caf50;
-    font-weight: bold;
+  background: var(--accent-clear);
+  color: white;
+  border: none;
+  box-shadow: 0 4px 10px rgba(239, 68, 68, 0.3);
+}
+.calc-btn.clear:hover {
+  box-shadow: 0 6px 15px rgba(239, 68, 68, 0.5);
+  filter: brightness(1.1);
+}
+
+/* 등호 (=) 버튼이 있다면 보통 operator 클래스를 같이 씁니다. 
+   만약 별도 클래스가 없다면 operator 스타일을 따릅니다. */
+
+/* 모바일 대응 */
+@media (max-width: 400px) {
+  .calculator-wrapper {
+    padding: 20px;
+  }
+  .calc-btn {
+    height: 60px;
+    font-size: 1.2em;
+  }
+  .result-display {
+    font-size: 2.2em;
+  }
 }

@@ -1,32 +1,17 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { 
-    initializeApp, 
-    getApps
-} from 'firebase/app';
-import { 
-    getAuth, 
-    signInAnonymously, 
-    signInWithCustomToken,
-    onAuthStateChanged
-} from 'firebase/auth';
-import { 
-    getFirestore, 
-    collection, 
-    addDoc, 
-    Timestamp,
-    doc,
-    updateDoc,
-    setLogLevel
-} from 'firebase/firestore';
+import { initializeApp, getApps } from 'firebase/app';
+import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from 'firebase/auth';
+import { getFirestore, collection, addDoc, Timestamp, doc, updateDoc, setLogLevel } from 'firebase/firestore';
+import '../../css/MemoUpsert.css'; // 👈 경로 확인해 주세요! (상위 폴더 css/MemoUpsert.css)
 
-// Firebase 전역 변수 설정 (변경하지 마세요)
+// Firebase 설정 (기존 유지)
 const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
 const REAL_FIREBASE_CONFIG = {
   apiKey: "AIzaSyBMupDsXUrSD_OlVVA4sXdSYoAF3eFMQ0M",
   authDomain: "hobby-b6440.firebaseapp.com",
   projectId: "hobby-b6440",
-  storageBucket: "hobby-b6440.firebasestorage.app",
+  storageBucket: "hobby-b6440.firebaseapp.com",
   messagingSenderId: "545763773120",
   appId: "1:545763773120:web:db79b30420ccae2fe87b25",
   measurementId: "G-R5CBNBY2G4"
@@ -37,221 +22,156 @@ const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial
 const MemoUpsert = () => {
     const navigate = useNavigate();
     const location = useLocation();
-
     const postToEdit = location.state?.postToEdit;
 
     const [title, setTitle] = useState("");
     const [content, setContent] = useState("");
+    const [imageUrl, setImageUrl] = useState(""); // 이미지 URL 상태
+
     const [db, setDb] = useState(null);
     const [auth, setAuth] = useState(null);
     const [isAuthReady, setIsAuthReady] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
     const [message, setMessage] = useState(null); 
-
     const isEditMode = !!postToEdit;
     
+    // 수정 모드일 때 데이터 불러오기
     useEffect(() => {
         if (postToEdit) {
             setTitle(postToEdit.title || '');
             setContent(postToEdit.content || '');
+            setImageUrl(postToEdit.imageUrl || '');
         }
     }, [postToEdit]);
 
-    // Firebase 초기화 및 인증 로직
+    // Firebase 초기화
     useEffect(() => {
         setLogLevel('debug');
         try {
-            // 중복 초기화 방지
             const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
-            
-            const firestoreDb = getFirestore(app);
-            const firebaseAuth = getAuth(app);
-            setDb(firestoreDb);
-            setAuth(firebaseAuth);
-
-            const handleAuth = async (authInstance) => {
-                try {
-                    if (initialAuthToken) {
-                        await signInWithCustomToken(authInstance, initialAuthToken);
-                    } else {
-                        await signInAnonymously(authInstance);
-                    }
-                } catch (authError) {
-                    console.error("Firebase Sign-In Error (Falling back to Anonymous):", authError);
-                    await signInAnonymously(authInstance);
-                }
+            setDb(getFirestore(app));
+            setAuth(getAuth(app));
+            const handleAuth = async (ai) => {
+                try { initialAuthToken ? await signInWithCustomToken(ai, initialAuthToken) : await signInAnonymously(ai); }
+                catch (e) { await signInAnonymously(ai); }
             };
-
-            const unsubscribe = onAuthStateChanged(firebaseAuth, (user) => {
-                setIsAuthReady(true);
-                if (!user) {
-                    handleAuth(firebaseAuth);
-                }
-            });
-            return () => unsubscribe();
-
-        } catch (error) {
-            console.error("Firebase Initialization Error:", error);
-            setMessage({ type: 'error', text: "Firebase 초기화 중 오류가 발생했습니다." });
-        }
+            const unsub = onAuthStateChanged(getAuth(app), (u) => { setIsAuthReady(true); if (!u) handleAuth(getAuth(app)); });
+            return () => unsub();
+        } catch (e) { setMessage({ type: 'error', text: "초기화 오류" }); }
     }, []);
 
-    // 메시지 초기화 타이머
+    // 메시지 타이머
     useEffect(() => {
-        if (message) {
-            const timer = setTimeout(() => setMessage(null), 3000);
-            return () => clearTimeout(timer);
-        }
+        if (message) { const t = setTimeout(() => setMessage(null), 3000); return () => clearTimeout(t); }
     }, [message]);
 
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        if (isSaving || !isAuthReady || !db || !auth.currentUser) return;
 
-    const handleSubmit = async (event) => {
-        event.preventDefault();
+        const tTitle = title.trim();
+        const tContent = content.trim();
+        const tImage = imageUrl.trim();
 
-        if (isSaving) return;
-
-        if (!isAuthReady || !db || !auth.currentUser) {
-            setMessage({ type: 'error', text: "DB 연결 및 사용자 인증 대기 중입니다. 다시 시도해 주세요." });
-            return;
-        }
-
-        const trimmedTitle = title.trim();
-        const trimmedContent = content.trim();
-
-        if (!trimmedTitle || !trimmedContent) {
-            setMessage({ type: 'error', text: "제목과 내용을 모두 입력해주세요." });
-            return;
-        }
+        if (!tTitle || !tContent) { setMessage({ type: 'error', text: "제목과 내용을 입력해주세요." }); return; }
 
         setIsSaving(true);
-        setMessage({ type: 'info', text: isEditMode ? "게시글 수정 중..." : "새 게시글 저장 중..." });
+        setMessage({ type: 'info', text: isEditMode ? "수정 중..." : "저장 중..." });
 
         try {
-            const collectionPath = `/artifacts/${appId}/public/data/posts`;
-            const currentUserId = auth.currentUser.uid;
-
+            const path = `/artifacts/${appId}/public/data/posts`;
             if (isEditMode) {
-                const docRef = doc(db, collectionPath, postToEdit.id);
-                await updateDoc(docRef, {
-                    title: trimmedTitle,
-                    content: trimmedContent,
-                    updatedAt: Timestamp.now(),
-                });
-                setMessage({ type: 'success', text: "✅ 게시글 수정 완료!" });
+                await updateDoc(doc(db, path, postToEdit.id), { title: tTitle, content: tContent, imageUrl: tImage, updatedAt: Timestamp.now() });
+                setMessage({ type: 'success', text: "수정 완료!" });
             } else {
-                const postData = {
-                    title: trimmedTitle,
-                    content: trimmedContent,
-                    date: Timestamp.now(),
-                    authorId: currentUserId,
-                };
-                await addDoc(collection(db, collectionPath), postData);
-                setMessage({ type: 'success', text: "✅ 게시글 등록 성공!" });
+                await addDoc(collection(db, path), { title: tTitle, content: tContent, imageUrl: tImage, date: Timestamp.now(), authorId: auth.currentUser.uid });
+                setMessage({ type: 'success', text: "등록 성공!" });
             }
-
-            setTimeout(() => {
-                navigate('/board');
-            }, 1500);
-
-        } catch (error) {
-            console.error("Firestore 작업 실패:", error);
-            setMessage({ type: 'error', text: `게시글 ${isEditMode ? '수정' : '등록'}에 실패했습니다: ${error.message}` });
-        } finally {
-            setIsSaving(false);
-        }
+            setTimeout(() => navigate('/board'), 1500);
+        } catch (err) {
+            setMessage({ type: 'error', text: "저장 실패" });
+        } finally { setIsSaving(false); }
     };
     
-    // UI 메시지 스타일 설정
-    const getMessageClasses = () => {
+    const getMsgClass = () => {
         if (!message) return "";
-        switch (message.type) {
-            case 'success':
-                return "bg-green-500 border-green-700";
-            case 'error':
-                return "bg-red-500 border-red-700";
-            case 'info':
-            default:
-                return "bg-blue-500 border-blue-700";
-        }
+        return message.type === 'success' ? 'msg-success' : message.type === 'error' ? 'msg-error' : 'msg-info';
     };
     
     return (
-        <div className="min-h-screen bg-gray-100 flex flex-col items-center font-sans">
-            {/* Header (디자인 개선: 그라데이션) */}
-            <header className="fixed top-0 left-0 w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-2xl p-4 flex justify-between items-center z-20">
-                <h1 className="text-2xl font-extrabold tracking-tight">{isEditMode ? "게시글 수정" : "새 게시글 작성"}</h1>
-                <button 
-                    className="bg-white bg-opacity-20 hover:bg-opacity-30 text-white font-semibold py-2 px-4 rounded-full shadow-lg transition duration-200 text-sm flex items-center"
-                    onClick={() => navigate("/board")}
-                >
-                    ⬅️ 목록으로
+        <div className="memo-upsert-container">
+            {/* 헤더 */}
+            <header className="memo-upsert-header">
+                <h1>{isEditMode ? "게시글 수정" : "새 글 작성"}</h1>
+                <button className="back-to-board" onClick={() => navigate("/board")}>
+                    목록으로
                 </button>
             </header>
 
-            {/* 메시지 알림 (CSS 개선: 팝업 스타일) */}
+            {/* 알림 메시지 */}
             {message && (
-                <div 
-                    className={`fixed top-20 left-1/2 transform -translate-x-1/2 z-30 p-4 rounded-xl shadow-2xl transition duration-500 ease-in-out border-b-4 ${getMessageClasses()}`}
-                >
-                    <p className="font-semibold text-white">{message.text}</p>
+                <div className={`message-popup ${getMsgClass()}`}>
+                    {message.text}
                 </div>
             )}
 
-            <main className="mt-28 w-full max-w-3xl p-4">
-                <form onSubmit={handleSubmit} className="bg-white p-8 rounded-2xl shadow-2xl border border-gray-200">
-                    <h2 className="text-3xl font-extrabold text-gray-800 mb-8 border-b-2 border-indigo-100 pb-4 text-center">
-                        {isEditMode ? "게시글 수정하기" : "새로운 글 작성"}
-                    </h2>
-                    
-                    <div className="mb-6">
-                        <label htmlFor="title" className="block text-sm font-bold text-gray-700 mb-2">제목</label>
-                        <input
-                            id="title"
-                            type="text"
-                            value={title}
-                            onChange={(e) => setTitle(e.target.value)}
-                            placeholder="주제를 명확하게 입력하세요"
-                            className="w-full p-4 border border-gray-300 rounded-xl focus:ring-indigo-500 focus:border-indigo-500 text-lg transition duration-150 shadow-inner"
-                            disabled={!isAuthReady || isSaving}
-                        />
-                    </div>
-                    
-                    <div className="mb-6">
-                        <label htmlFor="content" className="block text-sm font-bold text-gray-700 mb-2">내용</label>
-                        <textarea
-                            id="content"
-                            value={content}
-                            onChange={(e) => setContent(e.target.value)}
-                            placeholder="게시글 내용을 자유롭게 작성하세요..."
-                            className="w-full p-4 border border-gray-300 rounded-xl focus:ring-indigo-500 focus:border-indigo-500 text-base min-h-[350px] resize-y transition duration-150 shadow-inner"
-                            disabled={!isAuthReady || isSaving}
-                        />
-                    </div>
-                    
-                    <div className="flex justify-end gap-4 mt-8">
-                        <button 
-                            type="button" 
-                            onClick={() => navigate('/board')} 
-                            className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-3 px-6 rounded-full transition duration-200 shadow-lg hover:shadow-xl"
-                            disabled={isSaving}
-                        >
-                            취소
-                        </button>
-                        <button 
-                            type="submit" 
-                            // 버튼 색상 및 활성화/비활성화 상태 개선
-                            className={`font-bold py-3 px-6 rounded-full transition duration-200 shadow-lg hover:shadow-xl ${!isAuthReady || isSaving || !title.trim() || !content.trim() ? 
-                                'bg-gray-200 text-gray-500 cursor-not-allowed' : 
-                                (isEditMode ? 'bg-yellow-500 hover:bg-yellow-600 text-white' : 'bg-indigo-600 hover:bg-indigo-700 text-white')
-                            }`}
-                            disabled={!isAuthReady || isSaving || !title.trim() || !content.trim()}
-                        >
-                            {isSaving ? '처리 중...' : (isEditMode ? "수정 완료 ✅" : "저장 💾")}
-                        </button>
-                    </div>
-                    {!isAuthReady && <p className="text-center mt-4 text-sm text-red-500">인증 및 DB 연결 대기 중...</p>}
-                </form>
-            </main>
+            {/* 입력 폼 */}
+            <form className="memo-form" onSubmit={handleSubmit}>
+                <h2 className="form-title">{isEditMode ? "📝 글 수정하기" : "✨ 새 글 쓰기"}</h2>
+                
+                <div className="form-group">
+                    <label htmlFor="title">제목</label>
+                    <input
+                        id="title"
+                        type="text"
+                        value={title}
+                        onChange={(e) => setTitle(e.target.value)}
+                        placeholder="제목을 입력하세요"
+                        disabled={isSaving}
+                    />
+                </div>
+
+                <div className="form-group">
+                    <label htmlFor="imageUrl">썸네일 이미지 URL <span className="sub-text">(선택)</span></label>
+                    <input
+                        id="imageUrl"
+                        type="text"
+                        value={imageUrl}
+                        onChange={(e) => setImageUrl(e.target.value)}
+                        placeholder="https://..."
+                        disabled={isSaving}
+                    />
+                </div>
+                
+                <div className="form-group">
+                    <label htmlFor="content">내용</label>
+                    <textarea
+                        id="content"
+                        value={content}
+                        onChange={(e) => setContent(e.target.value)}
+                        placeholder="내용을 입력하세요..."
+                        disabled={isSaving}
+                    />
+                </div>
+                
+                <div className="form-actions">
+                    <button 
+                        type="button" 
+                        className="action-btn cancel-button"
+                        onClick={() => navigate('/board')}
+                        disabled={isSaving}
+                    >
+                        취소
+                    </button>
+                    <button 
+                        type="submit" 
+                        className="action-btn submit-button"
+                        disabled={!isAuthReady || isSaving || !title.trim() || !content.trim()}
+                    >
+                        {isSaving ? '저장 중...' : (isEditMode ? "수정 완료" : "등록하기")}
+                    </button>
+                </div>
+            </form>
         </div>
     );
 }

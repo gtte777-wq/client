@@ -1,192 +1,253 @@
-/* BoardList.css */
+/* BoardList.css - Dark Space Glass Theme (Fixed) */
 
-/* 전체 배경 및 컨테이너 */
-.board-list-container {
-    background-color: #f7f7f7; /* 밝은 배경색 */
-    min-height: 100vh;
-    padding-top: 60px; /* 헤더 공간 확보 */
-    font-family: 'Arial', sans-serif;
+:root {
+  --primary-color: #8b5cf6; /* 밝은 보라색 */
+  --text-main: #f9fafb;     /* 🚨 글씨를 흰색으로 변경 */
+  --text-sub: #cbd5e1;      /* 보조 글씨는 밝은 회색 */
+  --glass-dark: rgba(15, 23, 42, 0.85); /* 🌑 어두운 유리 배경 */
+  --border-glass: rgba(255, 255, 255, 0.15);
 }
 
-/* 상단 헤더 (짙은 다크 테마 유지) */
+/* 1. 전체 배경 */
+.board-list-container {
+  min-height: 100vh;
+  background-image: url("https://cdn.pixabay.com/photo/2016/11/29/05/45/astronomy-1867616_960_720.jpg");
+  background-size: cover;
+  background-position: center center;
+  background-attachment: fixed;
+  
+  padding: 100px 20px 60px;
+  font-family: 'Pretendard', sans-serif;
+  box-sizing: border-box;
+  
+  /* 중앙 정렬 보정 */
+  display: flex;
+  flex-direction: column;
+  align-items: center; 
+}
+
+/* 2. 헤더 */
 .board-header {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    background-color: #22252a; /* 짙은 배경 */
-    color: white;
-    padding: 10px 20px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    z-index: 10;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 70px;
+  background-color: rgba(0, 0, 0, 0.7); /* 헤더 진하게 */
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--border-glass);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 8%;
+  box-sizing: border-box;
+  z-index: 100;
 }
 
 .board-header h1 {
-    font-size: 1.5rem;
-    margin: 0;
-    font-weight: 600;
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: #ffffff;
+  margin: 0;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.8);
 }
 
-/* 액션 버튼 공통 스타일 */
-.action-button {
-    padding: 8px 15px;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    font-weight: bold;
-    transition: background-color 0.2s, box-shadow 0.2s;
-    margin-left: 10px;
+.user-status {
+  color: #e9d5ff;
+  background-color: rgba(255, 255, 255, 0.1);
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.85rem;
 }
 
-.action-button:hover {
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+/* 3. 툴바 */
+.board-toolbar {
+  width: 100%;
+  max-width: 900px; /* 리스트와 너비 맞춤 */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+  gap: 15px;
+  flex-wrap: wrap;
 }
 
-.back-to-home {
-    background-color: #6c757d; /* 회색 */
-    color: white;
+.search-box {
+  flex-grow: 1;
+  max-width: 400px;
 }
 
-.write-new {
-    background-color: #007bff; /* 파란색 */
-    color: white;
+.search-box input {
+  width: 100%;
+  padding: 12px 20px;
+  /* 검색창도 어둡게 변경 */
+  background-color: rgba(255, 255, 255, 0.15);
+  color: white; /* 입력 글씨 흰색 */
+  border: 1px solid var(--border-glass);
+  border-radius: 50px;
+  font-size: 0.95rem;
+  outline: none;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+  transition: all 0.2s;
 }
 
-.write-new:hover {
-    background-color: #0056b3;
+.search-box input::placeholder {
+  color: #94a3b8;
 }
 
-/* 사용자 ID 정보 (가독성 확보 및 작게 표시) */
-.user-id-info {
-    max-width: 800px;
-    margin: 20px auto 10px;
-    padding: 10px 20px;
-    background-color: #fff3cd; /* 경고색 배경 */
-    border: 1px solid #ffeeba;
-    border-radius: 4px;
-    color: #856404;
-    font-size: 0.8rem;
-    line-height: 1.5;
+.search-box input:focus {
+  background-color: rgba(255, 255, 255, 0.25);
+  border-color: var(--primary-color);
 }
 
-.user-id-info span {
-    font-weight: bold;
-    word-break: break-all;
+.btn {
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s ease;
 }
 
-.user-id-info .description {
-    margin: 5px 0 0;
-    font-size: 0.75rem;
+.btn-primary {
+  background: linear-gradient(135deg, #7c3aed, #4c1d95);
+  color: white;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
 }
 
-/* 게시글 목록 wrapper */
+.btn-outline {
+  background-color: rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--border-glass);
+  color: white;
+}
+
+.btn-outline:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+/* 4. 게시글 카드 (다크 모드 변경) */
 .post-list-wrapper {
-    margin: 20px auto;
-    background-color: white;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
-    border-radius: 8px;
-    overflow: hidden;
-    padding: 1px 0; /* 내부 경계선 처리를 위한 패딩 */
+  width: 100%;
+  max-width: 900px; /* 너비 제한 */
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
-/* 게시글 항목 (카드 스타일) */
 .post-item-card {
-    background-color: #fff;
-    border-radius: 8px;
-    padding: 40px 35px; /* 🚨 패딩을 극단적으로 키워서 변화 확인 */
-    min-height: 80px; /* 🚨 최소 높이를 80px로 조정합니다. */
-    margin-bottom: 15px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-    box-sizing: border-box; /* 패딩과 테두리가 너비에 포함되도록 설정 */
-    cursor: pointer; /* 전체 영역이 클릭 가능함을 표시 */
-}
-
-.post-item-card:last-child {
-    border-bottom: none;
+  display: flex;
+  /* 🚨 배경을 흰색 -> 어두운 남색 유리로 변경 */
+  background: var(--glass-dark); 
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--border-glass);
+  border-radius: 16px;
+  overflow: hidden;
+  cursor: pointer;
+  height: 170px;
+  transition: transform 0.3s, box-shadow 0.3s;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
 }
 
 .post-item-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  transform: translateY(-5px);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.7);
+  border-color: var(--primary-color); /* 호버 시 테두리 보라색 */
 }
 
-.post-content {
-    flex-grow: 1;
-    min-width: 0;
+.post-content-area {
+  flex: 1;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-width: 0;
 }
 
 .post-title {
-    font-size: 1.3rem; /* 제목 폰트 크기를 키웁니다. */
-    font-weight: 600;
-    color: #007bff; /* 제목 색상 강조 */
-    margin: 0 0 8px 0; /* 제목과 날짜 사이 간격 */
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #ffffff; /* 제목 흰색 */
+  margin: 0 0 10px 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.5);
 }
 
-.post-body {
-    font-size: 0.9rem;
-    color: #666;
-    margin-bottom: 5px;
+.post-preview {
+  font-size: 0.95rem;
+  color: var(--text-sub); /* 밝은 회색 */
+  line-height: 1.6;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  margin: 0;
 }
 
-.post-date {
-    font-size: 0.9rem; /* 날짜 폰트 크기를 키웁니다. */
-    color: #999;
+.post-meta {
+  font-size: 0.85rem;
+  color: #94a3b8;
+  display: flex;
+  gap: 12px;
+  margin-top: auto;
 }
 
-/* 게시글 액션 버튼 그룹 */
-.post-actions {
-    display: flex;
-    gap: 8px;
-    flex-shrink: 0;
-    margin-left: 20px;
+/* 썸네일 */
+.post-thumbnail {
+  width: 220px;
+  background-color: rgba(0,0,0,0.2); /* 썸네일 배경도 어둡게 */
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-left: 1px solid var(--border-glass);
 }
 
-/* 수정/삭제 버튼 (태그 스타일) */
-.edit-button {
-    background-color: #ffc107; /* 주황색 태그 */
-    color: #333;
-    padding: 4px 10px;
-    font-size: 0.85rem;
+.post-thumbnail img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s;
 }
 
-.delete-button {
-    background-color: #dc3545; /* 빨간색 태그 */
-    color: white;
-    padding: 4px 10px;
-    font-size: 0.85rem;
+.post-item-card:hover .post-thumbnail img {
+  transform: scale(1.1);
 }
 
-/* 게시글이 없을 때 메시지 */
-.no-posts-message {
-    padding: 40px;
-    text-align: center;
-    color: #999;
-    font-size: 1.1rem;
+.no-image-placeholder {
+  color: #64748b;
+  font-size: 0.75rem;
+  font-weight: 700;
 }
 
-/* MemoDetail.jsx에서 사용할 스타일 */
-.post-item-card .post-header {
-    border-bottom: 1px solid #eee;
-    padding-bottom: 15px;
-    margin-bottom: 20px;
+/* 상태 메시지 (로딩/없음) */
+.status-message {
+  text-align: center;
+  padding: 80px 20px;
+  color: #cbd5e1;
+  font-size: 1.1rem;
+  background: var(--glass-dark);
+  border-radius: 16px;
+  border: 1px solid var(--border-glass);
+  backdrop-filter: blur(5px);
 }
 
-.post-body-content p {
-    line-height: 1.7;
-    color: #444;
-}
-
-/* Footer 스타일 */
-.footer-area {
-    text-align: center;
-    padding: 20px 0;
-    color: #666;
-    font-size: 0.8rem;
+/* 모바일 대응 */
+@media (max-width: 768px) {
+  .post-item-card {
+    flex-direction: column-reverse;
+    height: auto;
+  }
+  .post-thumbnail {
+    width: 100%;
+    height: 200px;
+    border-left: none;
+    border-bottom: 1px solid var(--border-glass);
+  }
+  .board-list-container {
+    padding-top: 80px;
+  }
 }

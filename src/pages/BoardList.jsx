@@ -1,24 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { 
-    initializeApp, 
-    getApps,
-} from 'firebase/app';
-import { 
-    getAuth, 
-    signInAnonymously, 
-    onAuthStateChanged, 
-    signInWithCustomToken 
-} from 'firebase/auth';
-import { 
-    getFirestore, 
-    collection, 
-    query, 
-    onSnapshot, 
-    setLogLevel 
-} from 'firebase/firestore'; 
+import { initializeApp, getApps } from 'firebase/app';
+import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from 'firebase/auth';
+import { getFirestore, collection, query, onSnapshot, setLogLevel } from 'firebase/firestore';
+import '../../css/BoardList.css'; // 👈 CSS 파일 경로가 맞는지 꼭 확인하세요!
 
-// Firebase 전역 변수 설정 (변경하지 마세요)
+// Firebase 설정 (기존 유지)
 const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
 const REAL_FIREBASE_CONFIG = {
   apiKey: "AIzaSyBMupDsXUrSD_OlVVA4sXdSYoAF3eFMQ0M",
@@ -32,7 +19,6 @@ const REAL_FIREBASE_CONFIG = {
 const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : REAL_FIREBASE_CONFIG;
 const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
 
-
 export default function BoardList() {
     const navigate = useNavigate();
     const [db, setDb] = useState(null);
@@ -40,188 +26,144 @@ export default function BoardList() {
     const [posts, setPosts] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [isError, setIsError] = useState(false);
+    const [searchTerm, setSearchTerm] = useState('');
 
-    // 1. Firebase 초기화 및 인증 로직
+    // 1. Firebase 초기화 (기존 로직 유지)
     useEffect(() => {
         setLogLevel('debug');
         try {
-            // 중복 초기화 방지
             const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
-            
-            const firestoreDb = getFirestore(app);
-            const firebaseAuth = getAuth(app);
-            setDb(firestoreDb);
+            setDb(getFirestore(app));
+            const auth = getAuth(app);
 
             const handleAuth = async (authInstance) => {
                 try {
-                    if (initialAuthToken) {
-                        await signInWithCustomToken(authInstance, initialAuthToken);
-                    } else {
-                        await signInAnonymously(authInstance);
-                    }
-                } catch (error) {
-                    console.error("Firebase Sign-In Failed:", error);
+                    initialAuthToken 
+                        ? await signInWithCustomToken(authInstance, initialAuthToken)
+                        : await signInAnonymously(authInstance);
+                } catch (e) {
+                    console.error("Auth Failed:", e);
                     await signInAnonymously(authInstance);
                 }
             };
 
-            const unsubscribeAuth = onAuthStateChanged(firebaseAuth, (user) => {
-                if (user) {
-                    setUserId(user.uid);
-                } else {
-                    handleAuth(firebaseAuth);
-                }
+            const unsubscribe = onAuthStateChanged(auth, (user) => {
+                user ? setUserId(user.uid) : handleAuth(auth);
             });
 
-            const loadingTimeout = setTimeout(() => {
-                if (isLoading) {
-                    console.warn("로딩 타임아웃: 로딩 상태를 강제 해제합니다.");
-                    setIsLoading(false);
-                }
-            }, 3000);
+            // 3초 후에도 로딩 중이면 강제 해제
+            const timeout = setTimeout(() => isLoading && setIsLoading(false), 3000);
 
-            return () => {
-                unsubscribeAuth();
-                clearTimeout(loadingTimeout);
-            };
-        } catch (error) {
-            console.error("Firebase Initialization Error:", error);
+            return () => { unsubscribe(); clearTimeout(timeout); };
+        } catch (e) {
+            console.error("Init Error:", e);
             setIsError(true);
             setIsLoading(false);
         }
     }, []);
 
-    // 2. Firestore 데이터 실시간 로딩 로직
+    // 2. 데이터 로딩 (기존 로직 유지)
     useEffect(() => {
         if (!db || !userId) return;
-
-        const postsCollectionPath = `/artifacts/${appId}/public/data/posts`;
-        const q = query(collection(db, postsCollectionPath));
-
-        console.log(`[Firestore] 데이터 로딩 시작: ${postsCollectionPath}`);
+        const q = query(collection(db, `/artifacts/${appId}/public/data/posts`));
 
         const unsubscribe = onSnapshot(q, (snapshot) => {
-            const fetchedPosts = snapshot.docs.map(doc => ({
-                id: doc.id,
-                ...doc.data()
-            }));
-            
-            // 클라이언트 측에서 날짜 필드(date)를 기준으로 최신순 정렬
-            fetchedPosts.sort((a, b) => {
-                const dateA = a.date?.seconds * 1000 || 0; 
-                const dateB = b.date?.seconds * 1000 || 0;
-                return dateB - dateA; 
-            });
-
-            setPosts(fetchedPosts);
+            const list = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            // 날짜 최신순 정렬
+            list.sort((a, b) => (b.date?.seconds || 0) - (a.date?.seconds || 0));
+            setPosts(list);
             setIsLoading(false);
             setIsError(false);
-            console.log(`[Firestore] 게시글 ${fetchedPosts.length}개 로드 완료.`);
-        }, (error) => {
-            console.error("Firestore Snapshot Error:", error);
+        }, (err) => {
+            console.error(err);
             setIsError(true);
             setIsLoading(false);
         });
-
         return () => unsubscribe();
     }, [db, userId]);
 
-    const handleWriteClick = () => {
-        navigate('/write');
-    };
-    
-    // 로딩 및 에러 메시지 렌더링
-    const renderContent = () => {
-        if (isError) {
-            return (
-                <div className="bg-red-50 border-l-4 border-red-500 text-red-700 p-6 rounded-xl shadow-xl text-center mx-auto max-w-lg mt-10">
-                    <p className="font-bold text-xl mb-2">❌ 데이터 로드 실패 ❌</p>
-                    <p>데이터베이스 연결에 문제가 있습니다. F12 콘솔 창을 확인해 주세요.</p>
-                </div>
-            );
-        }
+    // 3. 검색 필터링
+    const filteredPosts = searchTerm 
+        ? posts.filter(p => p.title.toLowerCase().includes(searchTerm.toLowerCase()) || (p.content && p.content.toLowerCase().includes(searchTerm.toLowerCase())))
+        : posts;
 
-        if (isLoading) {
-            return (
-                <div className="text-center p-6 mt-10 text-gray-400">
-                    <p className="text-2xl animate-spin inline-block mr-2">🔄</p>
-                    <p className="text-2xl inline-block">데이터 로딩 중...</p>
-                </div>
-            );
-        }
-
-        if (posts.length === 0) {
-            return (
-                <div className="bg-blue-50 border-l-4 border-blue-500 text-blue-700 p-6 rounded-xl shadow-xl text-center mx-auto max-w-lg mt-10">
-                    <p className="font-bold text-xl mb-2">게시글이 없습니다.</p>
-                    <p>새 글 작성 버튼을 눌러 첫 게시글을 작성해 보세요!</p>
-                </div>
-            );
-        }
-
-        return posts.map(post => {
-            const rawDate = post.date?.seconds ? post.date.seconds * 1000 : null;
-            const displayDate = rawDate ? new Date(rawDate).toLocaleString('ko-KR') : '날짜 없음';
-            const displayAuthor = post.authorId ? `${post.authorId.substring(0, 8)}...` : '알 수 없음';
-
-            return (
-                <div
-                    key={post.id}
-                    // CSS 개선: 그림자, 애니메이션, 호버 효과 추가
-                    className="bg-white p-5 rounded-xl shadow-lg hover:shadow-2xl hover:scale-[1.01] transition duration-300 cursor-pointer flex justify-between items-center border border-gray-100"
-                    onClick={() => navigate(`/detail/${post.id}`)}
-                >
-                    <div className="truncate pr-4">
-                        <h2 className="text-xl font-semibold text-gray-900 truncate mb-1">{post.title}</h2>
-                        <span className="text-sm text-gray-500 mt-1 block">
-                            작성자: <span className="font-medium text-indigo-500">{displayAuthor}</span> | {displayDate}
-                        </span>
-                    </div>
-                    <span className="text-indigo-600 font-bold text-lg flex-shrink-0 ml-4">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                        </svg>
-                    </span>
-                </div>
-            )
-        });
-    };
+    // 날짜 포맷
+    const formatDate = (ts) => ts ? new Date(ts.seconds * 1000).toLocaleDateString('ko-KR') : '날짜 없음';
 
     return (
-        <div className="min-h-screen bg-gray-100 flex flex-col font-sans">
-            {/* Header (디자인 개선: 그라데이션, 그림자) */}
-            <header className="fixed top-0 left-0 w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-2xl p-4 flex justify-between items-center z-10">
-                <h1 className="text-2xl font-extrabold tracking-tight">📝 심플 게시판</h1>
-                <div className="flex gap-3">
-                    <button 
-                        className="bg-white bg-opacity-20 hover:bg-opacity-30 text-white font-semibold py-2 px-4 rounded-full shadow-lg transition duration-200 text-sm flex items-center"
-                        onClick={() => navigate("/")}
-                    >
-                        🏠 홈
-                    </button>
-                    <button 
-                        className="bg-green-400 hover:bg-green-500 text-gray-900 font-bold py-2 px-4 rounded-full shadow-lg transition duration-200 text-sm flex items-center"
-                        onClick={handleWriteClick}
-                    >
-                        새 글 작성 ✨
-                    </button>
-                </div>
+        <div className="board-list-container">
+            {/* 헤더 */}
+            <header className="board-header">
+                <h1>📝 Node.js 게시판</h1>
+                <span className="user-status">
+                    {userId ? `ID: ${userId.substring(0, 6)}...` : '연결 중...'}
+                </span>
             </header>
 
-            {/* Main Content Area */}
-            <main className="mt-24 w-full max-w-3xl mx-auto p-4 flex flex-col gap-4">
-                {userId && (
-                    <div className="bg-white p-4 rounded-xl text-sm text-gray-600 shadow-lg border-l-4 border-indigo-500 mb-4 break-all">
-                        <span className="font-bold">현재 사용자 ID:</span> <span className="font-mono text-indigo-700 break-words">{userId}</span>
-                    </div>
-                )}
-                {renderContent()}
-            </main>
+            {/* 툴바 */}
+            <div className="board-toolbar">
+                <div className="search-box">
+                    <input 
+                        type="text" 
+                        placeholder="검색어를 입력하세요..." 
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+                </div>
+                <div className="toolbar-actions">
+                    <button className="btn btn-outline" onClick={() => navigate("/")}>🏠 홈</button>
+                    <button className="btn btn-primary" onClick={() => navigate('/write')}>✏️ 글쓰기</button>
+                </div>
+            </div>
 
-            {/* Footer */}
-            <footer className="w-full text-center p-6 text-gray-500 text-sm mt-auto border-t border-gray-200">
-                <p>&copy; 2024 Simple Board App. All rights reserved.</p>
-            </footer>
+            {/* 게시글 목록 */}
+            <div className="post-list-wrapper">
+                {isLoading ? (
+                    <div className="status-message">
+                        데이터를 불러오고 있습니다... 🔄
+                    </div>
+                ) : isError ? (
+                    <div className="status-message error">
+                        데이터를 불러오지 못했습니다. 잠시 후 다시 시도해주세요.
+                    </div>
+                ) : filteredPosts.length === 0 ? (
+                    <div className="status-message">
+                        {searchTerm ? '검색 결과가 없습니다.' : '아직 등록된 게시글이 없습니다.'}
+                    </div>
+                ) : (
+                    filteredPosts.map(post => (
+                        <article 
+                            key={post.id} 
+                            className="post-item-card" 
+                            onClick={() => navigate(`/detail/${post.id}`)}
+                        >
+                            {/* 내용 영역 */}
+                            <div className="post-content-area">
+                                <div>
+                                    <h2 className="post-title">{post.title}</h2>
+                                    <p className="post-preview">
+                                        {post.content || "내용이 없습니다."}
+                                    </p>
+                                </div>
+                                <div className="post-meta">
+                                    <span>{post.authorId ? post.authorId.substring(0, 8) : '익명'}</span>
+                                    <span>•</span>
+                                    <span>{formatDate(post.date)}</span>
+                                </div>
+                            </div>
+
+                            {/* 썸네일 영역 */}
+                            <div className="post-thumbnail">
+                                {post.imageUrl ? (
+                                    <img src={post.imageUrl} alt="썸네일" />
+                                ) : (
+                                    <span className="no-image-placeholder">NO IMAGE</span>
+                                )}
+                            </div>
+                        </article>
+                    ))
+                )}
+            </div>
         </div>
     );
 }

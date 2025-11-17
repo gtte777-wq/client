@@ -1,0 +1,239 @@
+/* MemoDetail.css - Space Theme Fixed */
+
+:root {
+  --text-light: #f9fafb;       
+  --text-gray: #cbd5e1;        
+  --glass-dark: rgba(15, 23, 42, 0.85); /* 🌑 더 진한 남색 유리 */
+  --border-glass: rgba(255, 255, 255, 0.15); 
+}
+
+/* 1. 전체 컨테이너 */
+.memo-detail-container {
+  min-height: 100vh;
+  background-image: url("https://cdn.pixabay.com/photo/2016/11/29/05/45/astronomy-1867616_960_720.jpg");
+  background-size: cover;
+  background-position: center center;
+  background-attachment: fixed;
+  
+  /* 중앙 정렬 */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  
+  padding-top: 90px;
+  padding-bottom: 60px;
+  font-family: 'Pretendard', sans-serif;
+  box-sizing: border-box;
+}
+
+/* 2. 헤더 */
+.memo-detail-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 70px;
+  background-color: rgba(0, 0, 0, 0.8); /* 헤더 진하게 */
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--border-glass);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 5%;
+  box-sizing: border-box;
+  z-index: 100;
+}
+
+.memo-detail-header h1 {
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: var(--text-light);
+  margin: 0;
+}
+
+.back-to-board-btn {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: var(--text-light);
+  border: 1px solid var(--border-glass);
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.back-to-board-btn:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+/* 3. 메인 콘텐츠 영역 (🚨 흰색 박스 제거의 핵심) */
+.memo-detail-main {
+  width: 100%;
+  max-width: 900px; /* 최대 너비 설정 */
+  padding: 0 20px;
+  box-sizing: border-box;
+  
+  /* 🚨 혹시 모를 흰색 배경 강제 제거 */
+  background-color: transparent !important; 
+  box-shadow: none !important;
+  border: none !important;
+}
+
+/* 4. 실제 글 내용 카드 (🚨 너비 100%로 확장) */
+.post-content-card {
+  width: 100%; /* 부모 영역 꽉 채우기 */
+  
+  /* 어두운 유리 효과 */
+  background: var(--glass-dark);
+  backdrop-filter: blur(15px);
+  border: 1px solid var(--border-glass);
+  border-radius: 20px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7);
+  
+  overflow: hidden;
+  color: var(--text-light);
+  
+  /* 내부 요소 정렬 문제 해결 */
+  display: flex;
+  flex-direction: column;
+}
+
+/* 썸네일 이미지 스타일 */
+.post-content-card img {
+  width: 100%;
+  max-height: 450px;
+  object-fit: cover; /* 비율 유지하며 꽉 채우기 */
+  display: block;
+}
+
+/* 글 헤더 */
+.post-header-section {
+  padding: 40px 40px 20px;
+  border-bottom: 1px solid var(--border-glass);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.post-title {
+  font-size: 2rem;
+  font-weight: 800;
+  color: #ffffff;
+  margin: 0 0 15px 0;
+  line-height: 1.3;
+}
+
+.post-date {
+  font-size: 0.9rem;
+  color: #94a3b8;
+}
+
+/* 본문 */
+.post-body-section {
+  padding: 40px;
+  min-height: 300px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.post-content-text {
+  font-size: 1.1rem;
+  line-height: 1.8;
+  color: #e2e8f0;
+  white-space: pre-wrap;
+}
+
+/* 버튼 영역 */
+.post-actions-section {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 20px 40px 40px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.action-btn {
+  padding: 10px 20px;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  border: none;
+  transition: transform 0.2s;
+}
+
+.edit-btn {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  color: white;
+}
+
+.delete-btn {
+  background: linear-gradient(135deg, #ef4444, #b91c1c);
+  color: white;
+}
+
+.action-btn:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.1);
+}
+
+/* 삭제 확인 창 */
+.delete-confirmation {
+  padding: 30px;
+  background-color: rgba(0, 0, 0, 0.6);
+  text-align: center;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.confirmation-text {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #fca5a5;
+  margin-bottom: 20px;
+}
+
+.confirmation-actions {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+}
+
+/* 알림 팝업 */
+.message-popup {
+  position: fixed;
+  top: 100px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 12px 25px;
+  border-radius: 30px;
+  font-weight: 600;
+  color: white;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  z-index: 200;
+  animation: slideDown 0.4s ease-out;
+}
+.msg-success { background-color: #10b981; }
+.msg-error { background-color: #ef4444; }
+
+@keyframes slideDown {
+  from { transform: translate(-50%, -30px); opacity: 0; }
+  to { transform: translate(-50%, 0); opacity: 1; }
+}
+
+.memo-detail-footer {
+  margin-top: 40px;
+  color: #64748b;
+  font-size: 0.85rem;
+}
+
+/* 모바일 대응 */
+@media (max-width: 768px) {
+  .post-header-section, .post-body-section {
+    padding: 25px;
+  }
+  .post-title {
+    font-size: 1.5rem;
+  }
+}

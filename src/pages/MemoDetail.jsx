@@ -2,10 +2,9 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { initializeApp } from 'firebase/app';
 import { getFirestore, doc, getDoc, deleteDoc } from 'firebase/firestore';
+import '../../css/MemoDetail.css'; // 👈 새로 만든 CSS 파일을 임포트
 
-// import "../../css/BoardList.css"; // 🚨 CSS 파일 참조를 완전히 제거합니다.
-
-// Firebase 전역 변수 설정
+// Firebase 전역 변수 설정 (기존과 동일)
 const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
 const REAL_FIREBASE_CONFIG = {
   apiKey: "AIzaSyBMupDsXUrSD_OlVVA4sXdSYoAF3eFMQ0M",
@@ -18,17 +17,23 @@ const REAL_FIREBASE_CONFIG = {
 };
 const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : REAL_FIREBASE_CONFIG;
 
-// Firebase 앱 인스턴스를 한 번만 생성하여 재사용
+// Firebase 앱 인스턴스를 한 번만 생성
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
 export default function MemoDetail() {
     const navigate = useNavigate();
-    const { postId } = useParams(); // URL 파라미터에서 postId 추출
+    const { postId } = useParams();
     const [post, setPost] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
+    // 🚨 UX 개선을 위한 상태 추가
+    const [message, setMessage] = useState(null); // 팝업 메시지
+    const [isConfirmingDelete, setIsConfirmingDelete] = useState(false); // 삭제 확인 UI
+    const [isDeleting, setIsDeleting] = useState(false); // 삭제 처리 중
+
+    // 데이터 로딩 (기존 로직 유지)
     useEffect(() => {
         const fetchPost = async () => {
             try {
@@ -42,131 +47,146 @@ export default function MemoDetail() {
                         id: docSnap.id,
                         title: data.title,
                         content: data.content,
-                        date: data.date ? data.date.toDate().toLocaleString('ko-KR') : '날짜 없음',
+                        // 🚨 수정 페이지로 원본 데이터를 넘기기 위해 원본(raw) 데이터도 보관
+                        ...data 
                     });
                 } else {
                     setError("게시글을 찾을 수 없습니다.");
                 }
             } catch (err) {
-                console.error("Firestore 문서 조회 실패:", err);
-                setError("게시글을 불러오는 중 오류가 발생했습니다.");
+                console.error("Firestore Error:", err);
+                setError("게시글 로딩 중 오류 발생.");
             } finally {
                 setLoading(false);
             }
         };
-
-        if (postId) {
-            fetchPost();
-        }
+        if (postId) fetchPost();
     }, [postId]);
 
-    // 🚀 수정 버튼 핸들러
+    // 메시지 타이머
+    useEffect(() => {
+        if (message) {
+            const timer = setTimeout(() => setMessage(null), 2500);
+            return () => clearTimeout(timer);
+        }
+    }, [message]);
+
+    // 수정 버튼 핸들러 (기존 로직 유지)
     const handleEdit = () => {
-        // 🚨 수정 페이지로 이동 시, 현재 게시글 데이터를 state로 전달
         navigate(`/write`, { 
-            state: { postToEdit: post }
+            state: { postToEdit: post } // postToEdit에 원본 post 데이터 전달
         });
     };
 
-    // 🚀 삭제 버튼 핸들러
-    const handleDelete = async () => {
-        if (window.confirm("정말로 이 게시글을 삭제하시겠습니까?")) {
-            try {
-                const collectionPath = `/artifacts/${appId}/public/data/posts`;
-                const docRef = doc(db, collectionPath, postId);
-                await deleteDoc(docRef);
-                alert("게시글이 삭제되었습니다."); // 🚨 삭제 후
-                navigate("/board");
-            } catch (error) {
-                console.error("Firestore 문서 삭제 실패:", error);
-                alert("게시글 삭제에 실패했습니다.");
-            }
-        }
+    // 🚨 1. "삭제" 버튼 첫 클릭 시
+    const handleDeleteClick = () => {
+        setIsConfirmingDelete(true); // 확인 UI 표시
     };
 
-    // 🚨 인라인 스타일 객체 정의
-    const styles = {
-        container: {
-            backgroundColor: '#22252a',
-            minHeight: '100vh',
-            color: '#fff',
-            fontFamily: 'Arial, sans-serif',
-        },
-        header: {
-            backgroundColor: 'rgba(26, 43, 60, 0.9)',
-            padding: '20px 40px',
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
-        },
-        headerTitle: { margin: 0, fontSize: '1.8em' },
-        actionButton: {
-            border: 'none',
-            padding: '10px 20px',
-            borderRadius: '8px',
-            cursor: 'pointer',
-            fontWeight: 600,
-        },
-        backButton: {
-            backgroundColor: 'rgba(255, 255, 255, 0.1)',
-            color: '#f0f0f0',
-        },
-        main: {
-            maxWidth: '960px',
-            margin: '40px auto',
-            padding: '0 20px',
-        },
-        postCard: {
-            backgroundColor: '#2c3138',
-            borderRadius: '15px',
-            padding: '40px',
-        },
-        postHeader: {
-            borderBottom: '1px solid #444',
-            paddingBottom: '20px',
-            marginBottom: '20px',
-        },
-        postTitle: { fontSize: '2em', color: '#a9c1ff', margin: '0 0 10px 0' },
-        postDate: { fontSize: '0.9em', color: '#8a93a2' },
-        postContent: { fontSize: '1.1em', lineHeight: 1.7, color: '#c3cddc', whiteSpace: 'pre-wrap' },
-        postActions: { display: 'flex', gap: '15px', marginTop: '30px', justifyContent: 'flex-end' },
-        editButton: { backgroundColor: '#ffc107', color: '#333' },
-        deleteButton: { backgroundColor: '#dc3545', color: 'white' },
-        message: { textAlign: 'center', padding: '50px', fontSize: '1.2em' },
-        footer: { textAlign: 'center', padding: '20px', color: '#8a93a2', fontSize: '0.9em' }
+    // 🚨 2. "삭제 취소" 클릭 시
+    const handleCancelDelete = () => {
+        setIsConfirmingDelete(false); // 확인 UI 숨김
+    };
+
+    // 🚨 3. "확인" (진짜 삭제) 클릭 시
+    const handleConfirmDelete = async () => {
+        setIsDeleting(true); // 버튼 비활성화
+        try {
+            const collectionPath = `/artifacts/${appId}/public/data/posts`;
+            const docRef = doc(db, collectionPath, postId);
+            await deleteDoc(docRef);
+            
+            setMessage({ type: 'success', text: "게시글이 삭제되었습니다." }); // alert 대신 메시지
+            
+            setTimeout(() => {
+                navigate("/board"); // 1.5초 후 목록으로
+            }, 1500);
+
+        } catch (error) {
+            console.error("Firestore Error:", error);
+            setMessage({ type: 'error', text: "삭제에 실패했습니다." });
+            setIsDeleting(false); // 실패 시 버튼 활성화
+        }
+    };
+    
+    const getMsgClass = () => {
+        return message.type === 'success' ? 'msg-success' : 'msg-error';
     };
 
     return (
-        <div style={styles.container}>
-            <header style={styles.header}>
-                <h1 style={styles.headerTitle}>게시글 상세 내용</h1>
-                <button style={{...styles.actionButton, ...styles.backButton}} onClick={() => navigate("/board")}>
+        <div className="memo-detail-container">
+            {/* 팝업 메시지 (성공/실패 알림) */}
+            {message && (
+                <div className={`message-popup ${getMsgClass()}`}>
+                    {message.text}
+                </div>
+            )}
+            
+            <header className="memo-detail-header">
+                <h1>게시글 상세 내용</h1>
+                <button className="back-to-board-btn" onClick={() => navigate("/board")}>
                     목록으로 돌아가기
                 </button>
             </header>
 
-            <main style={styles.main}>
-                {loading && <p style={styles.message}>게시글을 불러오는 중...</p>}
-                {error && <p style={styles.message}>{error}</p>}
+            <main className="memo-detail-main">
+                {loading && <div className="message-container">게시글을 불러오는 중... 🔄</div>}
+                {error && <div className="message-container">{error}</div>}
                 {post && (
-                    <div style={styles.postCard}>
-                        <div style={styles.postHeader}>
-                            <h2 style={styles.postTitle}>{post.title}</h2>
-                            <span style={styles.postDate}>{post.date}</span>
+                    <div className="post-content-card">
+                        {/* 썸네일 이미지 (있을 경우에만 표시) */}
+                        {post.imageUrl && (
+                            <img src={post.imageUrl} alt="Post Thumbnail" style={{ width: '100%', maxHeight: '400px', objectFit: 'cover' }} />
+                        )}
+                        
+                        <div className="post-header-section">
+                            <h2 className="post-title">{post.title}</h2>
+                            <span className="post-date">
+                                {post.date ? new Date(post.date.seconds * 1000).toLocaleString('ko-KR') : '날짜 없음'}
+                            </span>
                         </div>
-                        <div>
-                            <p style={styles.postContent}>{post.content}</p>
+                        
+                        <div className="post-body-section">
+                            {/* white-space: pre-wrap을 위해 p태그 사용 */}
+                            <p className="post-content-text">{post.content}</p>
                         </div>
-                        <div style={styles.postActions}>
-                            <button style={{...styles.actionButton, ...styles.editButton}} onClick={handleEdit}>수정</button>
-                            <button style={{...styles.actionButton, ...styles.deleteButton}} onClick={handleDelete}>삭제</button>
-                        </div>
+
+                        {/* 🚨 삭제 확인 UI가 아닐 때만 "수정/삭제" 버튼 표시 */}
+                        {!isConfirmingDelete && (
+                            <div className="post-actions-section">
+                                <button className="action-btn edit-btn" onClick={handleEdit}>수정</button>
+                                <button className="action-btn delete-btn" onClick={handleDeleteClick}>삭제</button>
+                            </div>
+                        )}
+
+                        {/* 🚨 "삭제" 버튼을 눌렀을 때 표시되는 UI */}
+                        {isConfirmingDelete && (
+                            <div className="delete-confirmation">
+                                <p className="confirmation-text">정말로 이 게시글을 삭제하시겠습니까?</p>
+                                <div className="confirmation-actions">
+                                    <button 
+                                        className="action-btn" 
+                                        style={{ backgroundColor: '#9ca3af' }} 
+                                        onClick={handleCancelDelete}
+                                        disabled={isDeleting}
+                                    >
+                                        취소
+                                    </button>
+                                    <button 
+                                        className="action-btn delete-btn" 
+                                        onClick={handleConfirmDelete}
+                                        disabled={isDeleting}
+                                    >
+                                        {isDeleting ? "삭제 중..." : "예, 삭제합니다"}
+                                    </button>
+                                </div>
+                            </div>
+                        )}
                     </div>
                 )}
             </main>
 
-            <footer style={styles.footer}>
+            <footer className="memo-detail-footer">
                 <p>&copy; 2024 Simple Board App. Powered by Firestore.</p>
             </footer>
         </div>
