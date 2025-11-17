@@ -1,0 +1,171 @@
+/* ------------------------------------- */
+/* 1. 전체 페이지 레이아웃 (Layout)        */
+/* ------------------------------------- */
+.news-page-container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    background-color: #f8f9fa; /* 밝은 배경색 */
+}
+
+.news-header {
+    background-color: #343a40; /* 다크 헤더 배경 */
+    color: white;
+    padding: 15px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.news-header h1 {
+    margin: 0;
+    font-size: 24px;
+}
+
+/* ------------------------------------- */
+/* 2. 홈 화면으로 돌아가기 버튼 스타일     */
+/* ------------------------------------- */
+.back-button {
+    background-color: #17a2b8; /* 인포메이션 색상 */
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background-color 0.2s;
+}
+
+.back-button:hover {
+    background-color: #138496;
+}
+
+/* ------------------------------------- */
+/* 3. 메인 콘텐츠 영역 (검색/목록) 레이아웃 */
+/* ------------------------------------- */
+.news-content {
+    display: flex;
+    flex-grow: 1; /* Footer 제외하고 남은 공간 차지 */
+    max-width: 1200px;
+    width: 100%;
+    margin: 30px auto; /* 중앙 정렬 */
+    padding: 0 20px;
+}
+
+/* 🚨 수정: 검색 영역 폭을 줄여서 목록 영역이 더 넓게 보이도록 조정 */
+.search-filter-area {
+    width: 280px; /* 고정된 폭 */
+    padding: 20px;
+    margin-right: 20px;
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.05);
+    height: fit-content; /* 내용에 따라 높이 조정 */
+}
+
+.news-list-area {
+    flex-grow: 1;
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.05);
+}
+
+/* ------------------------------------- */
+/* 4. 검색 입력창 스타일                 */
+/* ------------------------------------- */
+.news-search-input {
+    width: 100%; /* 부모 요소(280px)에 맞춤 */
+    padding: 12px;
+    border: 1px solid #ced4da;
+    border-radius: 5px;
+    font-size: 16px;
+    box-sizing: border-box;
+    transition: border-color 0.2s;
+}
+
+.news-search-input:focus {
+    border-color: #007bff;
+    outline: none;
+}
+
+/* ------------------------------------- */
+/* 5. 뉴스 목록 항목 스타일              */
+/* ------------------------------------- */
+.news-item {
+    display: flex;
+    align-items: center;
+    padding: 15px 0;
+    border-bottom: 1px solid #eee;
+    font-size: 15px;
+}
+
+.news-item:last-child {
+    border-bottom: none;
+}
+
+.news-category {
+    padding: 4px 8px;
+    border-radius: 4px;
+    color: white;
+    font-size: 12px;
+    font-weight: 700;
+    margin-right: 15px;
+    min-width: 60px; /* 카테고리 폭 일정하게 유지 */
+    text-align: center;
+}
+
+.category-경제 {
+    background-color: #28a745; /* Green */
+}
+.category-IT {
+    background-color: #6f42c1; /* Purple */
+}
+.category-스포츠 {
+    background-color: #ffc107; /* Yellow */
+    color: #333;
+}
+.category-사회 {
+    background-color: #dc3545; /* Red */
+}
+
+.news-title {
+    flex-grow: 1;
+    color: #333;
+    text-decoration: none;
+    transition: color 0.2s;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.news-title:hover {
+    color: #007bff;
+}
+
+.news-date {
+    color: #6c757d;
+    font-size: 14px;
+    min-width: 80px;
+    text-align: right;
+}
+
+.no-results {
+    text-align: center;
+    color: #6c757d;
+    padding: 50px;
+    font-size: 16px;
+}
+
+/* ------------------------------------- */
+/* 6. Footer 스타일                      */
+/* ------------------------------------- */
+.news-footer {
+    text-align: center;
+    padding: 15px;
+    color: #6c757d;
+    font-size: 14px;
+    border-top: 1px solid #eee;
+    background-color: #f8f9fa;
+}

@@ -1,0 +1,105 @@
+/* MemoUpsert.css */
+
+.memo-upsert-container {
+    background-color: #f7f7f7; /* 밝은 배경색 */
+    min-height: 100vh;
+    padding-top: 60px; /* 헤더 공간 확보 */
+    font-family: 'Arial', sans-serif;
+}
+
+/* Header는 BoardList.css와 동일하게 유지 */
+.memo-upsert-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background-color: #22252a; /* 짙은 배경 */
+    color: white;
+    padding: 10px 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 10;
+}
+
+.memo-upsert-header h1 {
+    font-size: 1.5rem;
+    margin: 0;
+    font-weight: 600;
+}
+
+.back-to-board {
+    background-color: #6c757d;
+    color: white;
+}
+
+/* 폼 컨테이너 */
+.memo-form {
+    max-width: 800px;
+    margin: 30px auto;
+    padding: 30px;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #333;
+}
+
+/* 입력 필드 (깔끔한 라인 스타일) */
+.memo-form input[type="text"],
+.memo-form textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd; /* 간결한 테두리 */
+    border-radius: 4px;
+    box-sizing: border-box;
+    font-size: 1rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.memo-form input[type="text"]:focus,
+.memo-form textarea:focus {
+    border-color: #007bff;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+}
+
+.memo-form textarea {
+    resize: vertical;
+}
+
+/* 폼 액션 버튼 그룹 */
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 15px;
+    margin-top: 30px;
+}
+
+.submit-button {
+    background-color: #28a745; /* 초록색 저장 버튼 */
+    color: white;
+}
+
+.cancel-button {
+    background-color: #dc3545; /* 빨간색 취소 버튼 */
+    color: white;
+}
+
+/* Footer 스타일 */
+.footer-area {
+    text-align: center;
+    padding: 20px 0;
+    color: #666;
+    font-size: 0.8rem;
+}

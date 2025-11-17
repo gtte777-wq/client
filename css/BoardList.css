@@ -1,0 +1,192 @@
+/* BoardList.css */
+
+/* 전체 배경 및 컨테이너 */
+.board-list-container {
+    background-color: #f7f7f7; /* 밝은 배경색 */
+    min-height: 100vh;
+    padding-top: 60px; /* 헤더 공간 확보 */
+    font-family: 'Arial', sans-serif;
+}
+
+/* 상단 헤더 (짙은 다크 테마 유지) */
+.board-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background-color: #22252a; /* 짙은 배경 */
+    color: white;
+    padding: 10px 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 10;
+}
+
+.board-header h1 {
+    font-size: 1.5rem;
+    margin: 0;
+    font-weight: 600;
+}
+
+/* 액션 버튼 공통 스타일 */
+.action-button {
+    padding: 8px 15px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.2s, box-shadow 0.2s;
+    margin-left: 10px;
+}
+
+.action-button:hover {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.back-to-home {
+    background-color: #6c757d; /* 회색 */
+    color: white;
+}
+
+.write-new {
+    background-color: #007bff; /* 파란색 */
+    color: white;
+}
+
+.write-new:hover {
+    background-color: #0056b3;
+}
+
+/* 사용자 ID 정보 (가독성 확보 및 작게 표시) */
+.user-id-info {
+    max-width: 800px;
+    margin: 20px auto 10px;
+    padding: 10px 20px;
+    background-color: #fff3cd; /* 경고색 배경 */
+    border: 1px solid #ffeeba;
+    border-radius: 4px;
+    color: #856404;
+    font-size: 0.8rem;
+    line-height: 1.5;
+}
+
+.user-id-info span {
+    font-weight: bold;
+    word-break: break-all;
+}
+
+.user-id-info .description {
+    margin: 5px 0 0;
+    font-size: 0.75rem;
+}
+
+/* 게시글 목록 wrapper */
+.post-list-wrapper {
+    margin: 20px auto;
+    background-color: white;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+    border-radius: 8px;
+    overflow: hidden;
+    padding: 1px 0; /* 내부 경계선 처리를 위한 패딩 */
+}
+
+/* 게시글 항목 (카드 스타일) */
+.post-item-card {
+    background-color: #fff;
+    border-radius: 8px;
+    padding: 40px 35px; /* 🚨 패딩을 극단적으로 키워서 변화 확인 */
+    min-height: 80px; /* 🚨 최소 높이를 80px로 조정합니다. */
+    margin-bottom: 15px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    box-sizing: border-box; /* 패딩과 테두리가 너비에 포함되도록 설정 */
+    cursor: pointer; /* 전체 영역이 클릭 가능함을 표시 */
+}
+
+.post-item-card:last-child {
+    border-bottom: none;
+}
+
+.post-item-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.post-content {
+    flex-grow: 1;
+    min-width: 0;
+}
+
+.post-title {
+    font-size: 1.3rem; /* 제목 폰트 크기를 키웁니다. */
+    font-weight: 600;
+    color: #007bff; /* 제목 색상 강조 */
+    margin: 0 0 8px 0; /* 제목과 날짜 사이 간격 */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.post-body {
+    font-size: 0.9rem;
+    color: #666;
+    margin-bottom: 5px;
+}
+
+.post-date {
+    font-size: 0.9rem; /* 날짜 폰트 크기를 키웁니다. */
+    color: #999;
+}
+
+/* 게시글 액션 버튼 그룹 */
+.post-actions {
+    display: flex;
+    gap: 8px;
+    flex-shrink: 0;
+    margin-left: 20px;
+}
+
+/* 수정/삭제 버튼 (태그 스타일) */
+.edit-button {
+    background-color: #ffc107; /* 주황색 태그 */
+    color: #333;
+    padding: 4px 10px;
+    font-size: 0.85rem;
+}
+
+.delete-button {
+    background-color: #dc3545; /* 빨간색 태그 */
+    color: white;
+    padding: 4px 10px;
+    font-size: 0.85rem;
+}
+
+/* 게시글이 없을 때 메시지 */
+.no-posts-message {
+    padding: 40px;
+    text-align: center;
+    color: #999;
+    font-size: 1.1rem;
+}
+
+/* MemoDetail.jsx에서 사용할 스타일 */
+.post-item-card .post-header {
+    border-bottom: 1px solid #eee;
+    padding-bottom: 15px;
+    margin-bottom: 20px;
+}
+
+.post-body-content p {
+    line-height: 1.7;
+    color: #444;
+}
+
+/* Footer 스타일 */
+.footer-area {
+    text-align: center;
+    padding: 20px 0;
+    color: #666;
+    font-size: 0.8rem;
+}
