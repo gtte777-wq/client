@@ -1,171 +1,237 @@
-/* ------------------------------------- */
-/* 1. 전체 페이지 레이아웃 (Layout)        */
-/* ------------------------------------- */
+/* NewsList.css - Space Trading Dashboard Theme */
+
+:root {
+  --glass-dark: rgba(15, 23, 42, 0.85);
+  --glass-light: rgba(255, 255, 255, 0.05);
+  --border-glass: rgba(255, 255, 255, 0.15);
+  --text-main: #f9fafb;
+  --text-sub: #9ca3af;
+
+  /* 주식용 컬러 (상승/하락) */
+  --color-up: #ef4444; /* 한국장은 상승이 빨강 */
+  --color-down: #3b82f6; /* 한국장은 하락이 파랑 */
+  --color-neutral: #e5e7eb;
+}
+
 .news-page-container {
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-    background-color: #f8f9fa; /* 밝은 배경색 */
+  min-height: 100vh;
+  background-image: url("https://cdn.pixabay.com/photo/2016/11/29/05/45/astronomy-1867616_960_720.jpg");
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  font-family: "Pretendard", sans-serif;
+  padding-top: 80px;
+  box-sizing: border-box;
 }
 
+/* 헤더 */
 .news-header {
-    background-color: #343a40; /* 다크 헤더 배경 */
-    color: white;
-    padding: 15px 30px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 70px;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--border-glass);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 5%;
+  box-sizing: border-box;
+  z-index: 100;
 }
-
 .news-header h1 {
-    margin: 0;
-    font-size: 24px;
+  color: var(--text-main);
+  font-size: 1.4rem;
+  font-weight: 800;
 }
 
-/* ------------------------------------- */
-/* 2. 홈 화면으로 돌아가기 버튼 스타일     */
-/* ------------------------------------- */
 .back-button {
-    background-color: #17a2b8; /* 인포메이션 색상 */
-    color: white;
-    border: none;
-    padding: 10px 15px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-weight: 600;
-    transition: background-color 0.2s;
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  border: 1px solid var(--border-glass);
+  padding: 8px 16px;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.3s;
 }
-
 .back-button:hover {
-    background-color: #138496;
+  background: rgba(255, 255, 255, 0.25);
 }
 
-/* ------------------------------------- */
-/* 3. 메인 콘텐츠 영역 (검색/목록) 레이아웃 */
-/* ------------------------------------- */
+/* 메인 레이아웃 */
 .news-content {
-    display: flex;
-    flex-grow: 1; /* Footer 제외하고 남은 공간 차지 */
-    max-width: 1200px;
-    width: 100%;
-    margin: 30px auto; /* 중앙 정렬 */
-    padding: 0 20px;
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 20px;
 }
 
-/* 🚨 수정: 검색 영역 폭을 줄여서 목록 영역이 더 넓게 보이도록 조정 */
-.search-filter-area {
-    width: 280px; /* 고정된 폭 */
-    padding: 20px;
-    margin-right: 20px;
-    background-color: #ffffff;
-    border-radius: 10px;
-    box-shadow: 0 0 15px rgba(0, 0, 0, 0.05);
-    height: fit-content; /* 내용에 따라 높이 조정 */
+/* 1. 컨트롤 패널 (검색 + 필터) */
+.control-panel {
+  background: var(--glass-dark);
+  padding: 20px;
+  border-radius: 16px;
+  border: 1px solid var(--border-glass);
+  margin-bottom: 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
 }
 
-.news-list-area {
-    flex-grow: 1;
-    background-color: #ffffff;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 0 15px rgba(0, 0, 0, 0.05);
+.search-box-wrapper {
+  position: relative;
+  width: 100%;
+}
+.search-icon {
+  position: absolute;
+  left: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1.2rem;
+}
+.search-box-wrapper input {
+  width: 100%;
+  padding: 14px 14px 14px 45px;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--border-glass);
+  border-radius: 12px;
+  color: white;
+  font-size: 1rem;
+  box-sizing: border-box;
+}
+.search-box-wrapper input:focus {
+  outline: none;
+  border-color: #8b5cf6;
 }
 
-/* ------------------------------------- */
-/* 4. 검색 입력창 스타일                 */
-/* ------------------------------------- */
-.news-search-input {
-    width: 100%; /* 부모 요소(280px)에 맞춤 */
-    padding: 12px;
-    border: 1px solid #ced4da;
-    border-radius: 5px;
-    font-size: 16px;
-    box-sizing: border-box;
-    transition: border-color 0.2s;
+.filter-buttons {
+  display: flex;
+  gap: 10px;
+}
+.filter-btn {
+  padding: 8px 16px;
+  border-radius: 20px;
+  border: 1px solid var(--border-glass);
+  background: transparent;
+  color: var(--text-sub);
+  cursor: pointer;
+  transition: all 0.2s;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+.filter-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+.filter-btn.active {
+  color: white;
+  border-color: transparent;
 }
 
-.news-search-input:focus {
-    border-color: #007bff;
-    outline: none;
+/* 활성화된 버튼 색상 */
+.filter-btn.active {
+  background: #6b7280;
+}
+.filter-btn.positive.active {
+  background: var(--color-up);
+}
+.filter-btn.negative.active {
+  background: var(--color-down);
 }
 
-/* ------------------------------------- */
-/* 5. 뉴스 목록 항목 스타일              */
-/* ------------------------------------- */
-.news-item {
-    display: flex;
-    align-items: center;
-    padding: 15px 0;
-    border-bottom: 1px solid #eee;
-    font-size: 15px;
+/* 2. 뉴스 카드 그리드 */
+.news-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
 }
 
-.news-item:last-child {
-    border-bottom: none;
+.news-card {
+  background: var(--glass-dark);
+  padding: 25px;
+  border-radius: 16px;
+  border: 1px solid var(--border-glass);
+  border-left: 5px solid transparent; /* 상태 표시선 */
+  transition: transform 0.2s;
+}
+.news-card:hover {
+  transform: translateY(-3px);
 }
 
-.news-category {
-    padding: 4px 8px;
-    border-radius: 4px;
-    color: white;
-    font-size: 12px;
-    font-weight: 700;
-    margin-right: 15px;
-    min-width: 60px; /* 카테고리 폭 일정하게 유지 */
-    text-align: center;
+/* 호재/악재에 따른 왼쪽 라인 색상 */
+.news-card.positive {
+  border-left-color: var(--color-up);
+}
+.news-card.negative {
+  border-left-color: var(--color-down);
+}
+.news-card.neutral {
+  border-left-color: #9ca3af;
 }
 
-.category-경제 {
-    background-color: #28a745; /* Green */
+.news-meta {
+  font-size: 0.85rem;
+  color: var(--text-sub);
+  margin-bottom: 8px;
 }
-.category-IT {
-    background-color: #6f42c1; /* Purple */
-}
-.category-스포츠 {
-    background-color: #ffc107; /* Yellow */
-    color: #333;
-}
-.category-사회 {
-    background-color: #dc3545; /* Red */
+.news-source {
+  font-weight: 700;
+  color: #8b5cf6;
+  margin-right: 10px;
 }
 
 .news-title {
-    flex-grow: 1;
-    color: #333;
-    text-decoration: none;
-    transition: color 0.2s;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+  font-size: 1.25rem;
+  color: white;
+  margin: 0 0 10px 0;
+  line-height: 1.4;
+}
+.news-summary {
+  font-size: 0.95rem;
+  color: #d1d5db;
+  line-height: 1.6;
+  margin-bottom: 15px;
 }
 
-.news-title:hover {
-    color: #007bff;
+.news-footer-tags {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid var(--border-glass);
+  padding-top: 15px;
 }
 
-.news-date {
-    color: #6c757d;
-    font-size: 14px;
-    min-width: 80px;
-    text-align: right;
+.stock-tags {
+  display: flex;
+  gap: 8px;
+}
+.stock-badge {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  color: #e2e8f0;
+  border: 1px solid var(--border-glass);
+}
+
+.sentiment-badge {
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+.sentiment-badge.positive {
+  color: var(--color-up);
+}
+.sentiment-badge.negative {
+  color: var(--color-down);
+}
+.sentiment-badge.neutral {
+  color: var(--text-sub);
 }
 
 .no-results {
-    text-align: center;
-    color: #6c757d;
-    padding: 50px;
-    font-size: 16px;
-}
-
-/* ------------------------------------- */
-/* 6. Footer 스타일                      */
-/* ------------------------------------- */
-.news-footer {
-    text-align: center;
-    padding: 15px;
-    color: #6c757d;
-    font-size: 14px;
-    border-top: 1px solid #eee;
-    background-color: #f8f9fa;
+  text-align: center;
+  padding: 50px;
+  color: var(--text-sub);
+  background: var(--glass-dark);
+  border-radius: 16px;
 }

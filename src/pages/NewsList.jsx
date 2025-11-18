@@ -1,146 +1,155 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import "../../css/NewsList.css"; // CSS 파일 경로
-
-// ===============================================
-// 💡 1. 가상 뉴스 데이터 (Mock Data) 정의
-// ===============================================
-const MOCK_NEWS_DATA = [
-  {
-    id: 1,
-    title: "[경제] 삼성, AI칩 대량 생산 돌입... 메모리 시장 '빅사이클' 기대",
-    category: "경제",
-    date: "2024-11-13",
-  },
-  {
-    id: 2,
-    title: "[IT] React v19, 새로운 훅 공개... 개발자 생산성 향상 기대",
-    category: "IT/기술",
-    date: "2024-11-13",
-  },
-  {
-    id: 3,
-    title: "[스포츠] 대한민국 축구, 아시안컵 예선 3연승으로 조 1위 확정",
-    category: "스포츠",
-    date: "2024-11-12",
-  },
-  {
-    id: 4,
-    title: "[IT] 구글, 차세대 퀀텀 컴퓨팅 기술 발표... 연산 속도 획기적 개선",
-    category: "IT/기술",
-    date: "2024-11-12",
-  },
-  {
-    id: 5,
-    title: "[경제] 엔화 가치 급등, 국내 수출 기업에 비상... 환율 변동성 확대",
-    category: "경제",
-    date: "2024-11-11",
-  },
-  {
-    id: 6,
-    title: "[사회] 전국 미세먼지 농도 '매우 나쁨', 외출 자제 당부",
-    category: "사회",
-    date: "2024-11-11",
-  },
-  {
-    id: 7,
-    title: "[경제] 비트코인 8천만 원 돌파, 암호화폐 시장 '불마켓' 진입하나",
-    category: "경제",
-    date: "2024-11-10",
-  },
-  {
-    id: 8,
-    title: "[IT] 애플, 폴더블 아이폰 특허 출원... 2025년 출시 목표",
-    category: "IT/기술",
-    date: "2024-11-10",
-  },
-];
+import "../../css/NewsList.css";
 
 export default function NewsList() {
   const navigate = useNavigate();
-  // 💡 2. 검색어 상태 관리
+  const [newsData, setNewsData] = useState([]); // 뉴스 데이터 상태
+  const [loading, setLoading] = useState(true); // 로딩 상태
   const [searchTerm, setSearchTerm] = useState("");
-  // 💡 3. 필터링된 목록을 관리
-  const [filteredNews, setFilteredNews] = useState(MOCK_NEWS_DATA);
+  const [filterType, setFilterType] = useState("all");
 
-  // ===============================================
-  // 💡 4. 실시간 필터링 로직 (searchTerm이 변경될 때마다 실행)
-  // ===============================================
+  // 💡 서버에서 실시간 뉴스 가져오기
   useEffect(() => {
-    // 검색어가 비어 있으면 전체 목록을 보여줍니다.
-    if (searchTerm.trim() === "") {
-      setFilteredNews(MOCK_NEWS_DATA);
-      return;
+    const fetchNews = async () => {
+      try {
+        // 8080 포트 (서버)에서 데이터 수신
+        const response = await fetch("http://localhost:8080/api/news");
+        const result = await response.json();
+
+        if (result.success) {
+          setNewsData(result.data);
+        }
+      } catch (error) {
+        console.error("뉴스 로딩 에러:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchNews();
+
+    // 1분마다 자동 새로고침
+    const interval = setInterval(fetchNews, 60000);
+    return () => clearInterval(interval);
+  }, []);
+
+  // 필터링 로직
+  const getFilteredNews = () => {
+    let results = newsData;
+
+    // 검색어 필터
+    if (searchTerm.trim() !== "") {
+      results = results.filter((news) =>
+        news.title.toLowerCase().includes(searchTerm.toLowerCase())
+      );
     }
 
-    // 검색어가 포함된 기사만 필터링합니다. (제목 기준으로 대소문자 구분 없이)
-    const lowerCaseSearchTerm = searchTerm.toLowerCase();
-    const results = MOCK_NEWS_DATA.filter((news) =>
-      news.title.toLowerCase().includes(lowerCaseSearchTerm)
-    );
-
-    setFilteredNews(results);
-  }, [searchTerm]); // 검색어(searchTerm)가 바뀔 때마다 이 함수를 실행합니다.
-
-  const handleSearchChange = (event) => {
-    setSearchTerm(event.target.value);
+    // 호재/악재 필터
+    if (filterType !== "all") {
+      results = results.filter((news) => news.sentiment === filterType);
+    }
+    return results;
   };
+
+  const filteredNews = getFilteredNews();
 
   return (
     <div className="news-page-container">
+      {/* 1. 헤더 영역 (여기에 버튼이 들어갑니다!) */}
       <header className="news-header">
-        <h1>뉴스 헤드라인 필터링</h1>
-        <div className="header-actions">
-          {/* 🚨 수정: 게시판 -> 홈 화면 경로 '/' */}
+        <h1>📊 Global News Watch</h1>
+
+        {/* 💡 네비게이션 버튼 그룹 */}
+        <div style={{ display: "flex", gap: "10px" }}>
+          <button className="back-button" onClick={() => navigate("/stock")}>
+            📈 차트 보기
+          </button>
           <button className="back-button" onClick={() => navigate("/")}>
-            🏠 홈 화면으로 돌아가기
+            🏠 홈으로
           </button>
         </div>
       </header>
 
       <main className="news-content">
-        {/* 왼쪽 검색/필터 영역 */}
-        <div className="search-filter-area">
-          {/* 검색 입력창 */}
-          <input
-            type="text"
-            placeholder="뉴스 제목에서 키워드를 검색하세요..."
-            value={searchTerm}
-            onChange={handleSearchChange} // 입력 시 바로 상태 업데이트
-            className="news-search-input"
-          />
-          {/* 참고: 검색 버튼은 실시간 필터링이 적용되므로 제거하거나 숨길 수 있습니다. */}
-        </div>
+        {/* 2. 컨트롤 패널 (검색 및 필터 버튼) */}
+        <section className="control-panel">
+          <div className="search-box-wrapper">
+            <span className="search-icon">🔍</span>
+            <input
+              type="text"
+              placeholder="뉴스 제목 또는 키워드 검색..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
 
-        {/* 오른쪽 뉴스 목록 영역 */}
-        <div className="news-list-area">
-          {filteredNews.length > 0 ? (
+          <div className="filter-buttons">
+            <button
+              className={`filter-btn ${filterType === "all" ? "active" : ""}`}
+              onClick={() => setFilterType("all")}
+            >
+              전체
+            </button>
+            <button
+              className={`filter-btn positive ${
+                filterType === "positive" ? "active" : ""
+              }`}
+              onClick={() => setFilterType("positive")}
+            >
+              🔥 호재만 보기
+            </button>
+            <button
+              className={`filter-btn negative ${
+                filterType === "negative" ? "active" : ""
+              }`}
+              onClick={() => setFilterType("negative")}
+            >
+              💧 악재만 보기
+            </button>
+          </div>
+        </section>
+
+        {/* 3. 뉴스 리스트 그리드 */}
+        <section className="news-grid">
+          {loading ? (
+            <div className="status-message">
+              📡 전 세계 뉴스를 수신 중입니다...
+            </div>
+          ) : filteredNews.length > 0 ? (
             filteredNews.map((news) => (
-              <div key={news.id} className="news-item">
-                <span
-                  className={`news-category category-${
-                    news.category.split("/")[0]
-                  }`}
-                >
-                  {news.category}
-                </span>
-                <a href="#" className="news-title">
-                  {news.title}
-                </a>
-                <span className="news-date">{news.date}</span>
-              </div>
+              <article
+                key={news.id}
+                className={`news-card ${news.sentiment}`}
+                onClick={() => window.open(news.link, "_blank")}
+              >
+                <div className="news-meta">
+                  <span className="news-source">{news.source}</span>
+                  <span className="news-date">
+                    {new Date(news.pubDate).toLocaleTimeString()}
+                  </span>
+                </div>
+                <h3 className="news-title">{news.title}</h3>
+                <p className="news-summary">
+                  {news.content.substring(0, 80)}...
+                </p>
+                <div className="news-footer-tags">
+                  <span className={`sentiment-badge ${news.sentiment}`}>
+                    {news.sentiment === "positive"
+                      ? "▲ 상승신호"
+                      : news.sentiment === "negative"
+                      ? "▼ 하락주의"
+                      : "● 일반"}
+                  </span>
+                </div>
+              </article>
             ))
           ) : (
-            <p className="no-results">
-              '{searchTerm}'에 해당하는 뉴스를 찾을 수 없습니다.
-            </p>
+            <div className="no-results">
+              <p>조건에 맞는 뉴스가 없습니다.</p>
+            </div>
           )}
-        </div>
+        </section>
       </main>
-
-      <footer className="news-footer">
-        <p>&copy; 2024 Local News Project. 데이터는 가상으로 제공됩니다.</p>
-      </footer>
     </div>
   );
 }
