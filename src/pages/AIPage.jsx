@@ -23,11 +23,18 @@ export default function AIPage() {
       path: "/ai/rice",
     },
     {
-      id: "coming-soon",
-      icon: "🚀",
-      title: "준비 중...",
-      description: "더 놀라운 AI 모델들이 추가될 예정입니다.",
-      path: "#",
+      id: "plant",
+      icon: "🌿",
+      title: "식물 종합 병원",
+      description: "다양한 식물의 질병을 AI가 정밀하게 진단합니다.",
+      path: "/ai/plant",
+    },
+    {
+      id: "face",
+      icon: "👤",
+      title: "인물 신원 확인",
+      description: "등록된 인물 DB에서 얼굴을 식별합니다.",
+      path: "/ai/face",
     },
   ];
 
