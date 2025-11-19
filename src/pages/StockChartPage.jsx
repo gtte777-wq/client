@@ -24,27 +24,21 @@ export default function StockChartPage() {
           `https://api.upbit.com/v1/candles/minutes/60?market=${activeStock.code}&count=200`
         );
         const data = await response.json();
-
         if (!data || data.error) return;
 
-        // 📊 데이터 가공 (거래량 + 색상 로직 추가)
-        const formattedData = data.map((item) => {
-          const isUp = item.trade_price >= item.opening_price; // 양봉(상승) 여부
-
-          return {
-            time:
-              new Date(item.candle_date_time_kst).getTime() / 1000 +
-              9 * 60 * 60,
-            open: item.opening_price,
-            high: item.high_price,
-            low: item.low_price,
-            close: item.trade_price,
-            // 👇 거래량 데이터 추가
-            value: item.candle_acc_trade_volume,
-            // 👇 양봉이면 빨강(투명도), 음봉이면 파랑(투명도)
-            color: isUp ? "rgba(239, 68, 68, 0.5)" : "rgba(59, 130, 246, 0.5)",
-          };
-        });
+        const formattedData = data.map((item) => ({
+          time:
+            new Date(item.candle_date_time_kst).getTime() / 1000 + 9 * 60 * 60,
+          open: item.opening_price,
+          high: item.high_price,
+          low: item.low_price,
+          close: item.trade_price,
+          value: item.candle_acc_trade_volume,
+          color:
+            item.trade_price >= item.opening_price
+              ? "rgba(239, 68, 68, 0.5)"
+              : "rgba(59, 130, 246, 0.5)",
+        }));
 
         const reversedData = formattedData.reverse();
         setChartData(reversedData);
@@ -85,8 +79,25 @@ export default function StockChartPage() {
           marginBottom: "20px",
           display: "flex",
           justifyContent: "flex-end",
+          gap: "10px",
         }}
       >
+        {/* 🚨 [UX Patch] 뒤로 가기 추가 */}
+        <button
+          onClick={() => navigate(-1)}
+          style={{
+            padding: "10px 20px",
+            borderRadius: "30px",
+            border: "1px solid rgba(255,255,255,0.2)",
+            background: "rgba(255,255,255,0.1)",
+            color: "white",
+            fontWeight: "bold",
+            cursor: "pointer",
+            backdropFilter: "blur(5px)",
+          }}
+        >
+          ↩ Back
+        </button>
         <button
           onClick={() => navigate("/")}
           style={{
@@ -195,13 +206,12 @@ export default function StockChartPage() {
         </div>
       </div>
 
-      {/* 캔들 + 거래량 차트 영역 */}
+      {/* 차트 영역 */}
       <div
         style={{
           width: "90%",
           maxWidth: "1000px",
           height: "550px",
-          minHeight: "550px",
           background: "rgba(15, 23, 42, 0.95)",
           borderRadius: "20px",
           padding: "20px",

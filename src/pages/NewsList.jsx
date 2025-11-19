@@ -4,22 +4,17 @@ import "../../css/NewsList.css";
 
 export default function NewsList() {
   const navigate = useNavigate();
-  const [newsData, setNewsData] = useState([]); // 뉴스 데이터 상태
-  const [loading, setLoading] = useState(true); // 로딩 상태
+  const [newsData, setNewsData] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterType, setFilterType] = useState("all");
 
-  // 💡 서버에서 실시간 뉴스 가져오기
   useEffect(() => {
     const fetchNews = async () => {
       try {
-        // 8080 포트 (서버)에서 데이터 수신
         const response = await fetch("http://localhost:8080/api/news");
         const result = await response.json();
-
-        if (result.success) {
-          setNewsData(result.data);
-        }
+        if (result.success) setNewsData(result.data);
       } catch (error) {
         console.error("뉴스 로딩 에러:", error);
       } finally {
@@ -27,24 +22,17 @@ export default function NewsList() {
       }
     };
     fetchNews();
-
-    // 1분마다 자동 새로고침
     const interval = setInterval(fetchNews, 60000);
     return () => clearInterval(interval);
   }, []);
 
-  // 필터링 로직
   const getFilteredNews = () => {
     let results = newsData;
-
-    // 검색어 필터
     if (searchTerm.trim() !== "") {
       results = results.filter((news) =>
         news.title.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
-
-    // 호재/악재 필터
     if (filterType !== "all") {
       results = results.filter((news) => news.sentiment === filterType);
     }
@@ -55,23 +43,23 @@ export default function NewsList() {
 
   return (
     <div className="news-page-container">
-      {/* 1. 헤더 영역 (여기에 버튼이 들어갑니다!) */}
       <header className="news-header">
         <h1>📊 Global News Watch</h1>
-
-        {/* 💡 네비게이션 버튼 그룹 */}
         <div style={{ display: "flex", gap: "10px" }}>
+          {/* 🚨 [UX Patch] 뒤로 가기 추가 */}
+          <button className="back-button" onClick={() => navigate(-1)}>
+            ↩ 뒤로
+          </button>
           <button className="back-button" onClick={() => navigate("/stock")}>
             📈 차트 보기
           </button>
           <button className="back-button" onClick={() => navigate("/")}>
-            🏠 홈으로
+            🏠 홈
           </button>
         </div>
       </header>
 
       <main className="news-content">
-        {/* 2. 컨트롤 패널 (검색 및 필터 버튼) */}
         <section className="control-panel">
           <div className="search-box-wrapper">
             <span className="search-icon">🔍</span>
@@ -82,7 +70,6 @@ export default function NewsList() {
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
-
           <div className="filter-buttons">
             <button
               className={`filter-btn ${filterType === "all" ? "active" : ""}`}
@@ -109,7 +96,6 @@ export default function NewsList() {
           </div>
         </section>
 
-        {/* 3. 뉴스 리스트 그리드 */}
         <section className="news-grid">
           {loading ? (
             <div className="status-message">

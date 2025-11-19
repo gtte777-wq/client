@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../../css/Home.css";
 
+import { db } from "../firebase";
+import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 export default function AIFacePage() {
   const navigate = useNavigate();
   const [selectedImage, setSelectedImage] = useState(null);
@@ -23,7 +25,7 @@ export default function AIFacePage() {
     setLoading(true);
     const formData = new FormData();
     formData.append("file", selectedImage);
-    formData.append("modelType", "face"); // 🚨 'face' 모델 요청
+    formData.append("modelType", "face"); // 🚨 파이썬한테 보낼 이름
 
     try {
       const response = await fetch("http://localhost:8080/api/ai-predict", {
@@ -31,8 +33,24 @@ export default function AIFacePage() {
         body: formData,
       });
       const data = await response.json();
-      if (data.success) setResult(data.result);
-      else alert("분석 실패: " + (data.message || data.error));
+
+      if (data.success) {
+        setResult(data.result);
+
+        // 👇 [저장 코드] 인물용 이름표
+        try {
+          await addDoc(collection(db, "ai_history"), {
+            modelType: "인물 신원 확인", // 📝 기록실에 보여질 이름
+            label: data.result.label,
+            confidence: data.result.confidence,
+            timestamp: serverTimestamp(),
+          });
+        } catch (e) {
+          console.error("저장 실패", e);
+        }
+      } else {
+        alert("분석 실패: " + (data.message || data.error));
+      }
     } catch (error) {
       alert("서버 에러");
     } finally {
@@ -46,12 +64,13 @@ export default function AIFacePage() {
         className="home-content-container"
         style={{ maxWidth: "600px", border: "1px solid #06b6d4" }}
       >
+        {/* 1. 헤더 & 뒤로가기 버튼 */}
         <div
           style={{
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
-            marginBottom: "30px",
+            marginBottom: "20px",
           }}
         >
           <h1
@@ -66,7 +85,9 @@ export default function AIFacePage() {
             👤 인물 신원 확인
           </h1>
           <button
-            onClick={() => navigate("/ai")}
+            onClick={() =>
+              navigate(-1)
+            } /* ⬅️ 뒤로 가기 기능 (이전 페이지로 이동) */
             style={{
               padding: "8px 16px",
               borderRadius: "20px",
@@ -74,12 +95,70 @@ export default function AIFacePage() {
               background: "rgba(0,0,0,0.5)",
               color: "#22d3ee",
               cursor: "pointer",
+              fontWeight: "bold",
             }}
           >
-            ↩ 돌아가기
+            ↩ 뒤로 가기
           </button>
         </div>
 
+        {/* 2. 🚨 인식 가능 인물 안내 (요청하신 부분) */}
+        <div
+          style={{
+            background: "rgba(6, 182, 212, 0.1)",
+            border: "1px dashed #22d3ee",
+            borderRadius: "10px",
+            padding: "15px",
+            marginBottom: "30px",
+            textAlign: "left",
+          }}
+        >
+          <p
+            style={{
+              margin: "0 0 10px 0",
+              color: "#67e8f9",
+              fontWeight: "bold",
+              fontSize: "1rem",
+            }}
+          >
+            📋 현재 식별 가능한 인물 (DB)
+          </p>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
+            {/* 5명 이름표 배지 */}
+            {[
+              "강호동",
+              "카리나",
+              "박명수",
+              "앤서니 조슈아",
+              "프란시스 은가누",
+            ].map((name, idx) => (
+              <span
+                key={idx}
+                style={{
+                  background: "rgba(34, 211, 238, 0.2)",
+                  color: "white",
+                  padding: "5px 10px",
+                  borderRadius: "15px",
+                  fontSize: "0.85rem",
+                  border: "1px solid rgba(34, 211, 238, 0.3)",
+                }}
+              >
+                {name}
+              </span>
+            ))}
+          </div>
+          <p
+            style={{
+              margin: "10px 0 0 0",
+              color: "#9ca3af",
+              fontSize: "0.8rem",
+            }}
+          >
+            * 위 5명 외의 인물은 'Unknown'으로 표시될 수 있습니다.
+          </p>
+        </div>
+
+        {/* 3. 업로드 영역 */}
         <div
           style={{
             background: "rgba(0,0,0,0.6)",
@@ -110,7 +189,7 @@ export default function AIFacePage() {
                 style={{ width: "100%", height: "100%", objectFit: "contain" }}
               />
             ) : (
-              <span style={{ color: "#0891b2" }}>사진을 스캔해주세요</span>
+              <span style={{ color: "#0891b2" }}>분석할 사진을 올려주세요</span>
             )}
           </div>
 
@@ -119,10 +198,10 @@ export default function AIFacePage() {
             accept="image/*"
             onChange={handleImageChange}
             style={{ display: "none" }}
-            id="file-upload"
+            id="file-upload-face"
           />
           <label
-            htmlFor="file-upload"
+            htmlFor="file-upload-face"
             style={{
               display: "inline-block",
               padding: "10px 20px",
@@ -153,6 +232,7 @@ export default function AIFacePage() {
           </button>
         </div>
 
+        {/* 4. 결과 영역 */}
         {result && (
           <div
             style={{

@@ -13,6 +13,7 @@ import AIMuffinPage from "./pages/AIMuffinPage.jsx";
 import AIPlantPage from "./pages/AIPlantPage.jsx";
 import AIRicePage from "./pages/AIRicePage.jsx";
 import AIFacePage from "./pages/AIFacePage.jsx";
+import AIHistoryPage from "./pages/AIHistoryPage.jsx";
 
 export default function App() {
   return (
@@ -37,6 +38,7 @@ export default function App() {
       <Route path="/ai/plant" element={<AIPlantPage />} />
       <Route path="/ai/rice" element={<AIRicePage />} />
       <Route path="/ai/face" element={<AIFacePage />} />
+      <Route path="/ai/history" element={<AIHistoryPage />} />
     </Routes>
   );
 }

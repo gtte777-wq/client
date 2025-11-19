@@ -1,11 +1,10 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import "../../css/Home.css"; // 기존 디자인 재사용 (우주 테마)
+import "../../css/Home.css";
 
 export default function AIPage() {
   const navigate = useNavigate();
 
-  // 🤖 AI 모델 목록
   const aiModels = [
     {
       id: "muffin",
@@ -40,10 +39,8 @@ export default function AIPage() {
 
   return (
     <div className="home-page-background">
-      {" "}
-      {/* 우주 배경 */}
       <div className="home-content-container">
-        {/* 헤더 영역 */}
+        {/* 1. 헤더 영역 */}
         <div
           style={{
             display: "flex",
@@ -53,7 +50,6 @@ export default function AIPage() {
           }}
         >
           <div>
-            {/* 헤더 타이틀도 별빛 색상으로 변경 */}
             <h1
               className="home-title"
               style={{
@@ -72,38 +68,72 @@ export default function AIPage() {
               딥러닝 모델을 활용한 이미지 분석 체험관
             </p>
           </div>
-          <button
-            onClick={() => navigate("/")}
-            style={{
-              padding: "12px 24px",
-              borderRadius: "30px",
-              border: "1px solid rgba(255,255,255,0.2)",
-              background: "rgba(255,255,255,0.1)",
-              color: "white",
-              fontWeight: "bold",
-              cursor: "pointer",
-              backdropFilter: "blur(5px)",
-              transition: "0.3s",
-            }}
-          >
-            🏠 Home
-          </button>
+
+          {/* 2. 버튼 그룹 (여기가 꼬였던 부분입니다! 깔끔하게 분리했습니다.) */}
+          <div style={{ display: "flex", gap: "10px" }}>
+            {/* 📋 기록 보기 버튼 */}
+            <button
+              onClick={() => navigate("/ai/history")}
+              style={{
+                padding: "12px 20px",
+                borderRadius: "30px",
+                border: "1px solid #c084fc",
+                background: "rgba(192, 132, 252, 0.2)",
+                color: "#e9d5ff",
+                fontWeight: "bold",
+                cursor: "pointer",
+                backdropFilter: "blur(5px)",
+              }}
+            >
+              📋 기록 보기
+            </button>
+
+            {/* ↩ 뒤로 가기 버튼 */}
+            <button
+              onClick={() => navigate(-1)}
+              style={{
+                padding: "12px 20px",
+                borderRadius: "30px",
+                border: "1px solid rgba(255,255,255,0.2)",
+                background: "rgba(255,255,255,0.1)",
+                color: "white",
+                fontWeight: "bold",
+                cursor: "pointer",
+                backdropFilter: "blur(5px)",
+              }}
+            >
+              ↩ 뒤로
+            </button>
+
+            {/* 🏠 홈 버튼 */}
+            <button
+              onClick={() => navigate("/")}
+              style={{
+                padding: "12px 20px",
+                borderRadius: "30px",
+                border: "1px solid rgba(255,255,255,0.2)",
+                background: "rgba(255,255,255,0.1)",
+                color: "white",
+                fontWeight: "bold",
+                cursor: "pointer",
+                backdropFilter: "blur(5px)",
+              }}
+            >
+              🏠 Home
+            </button>
+          </div>
         </div>
 
-        {/* 모델 리스트 그리드 */}
+        {/* 3. 모델 리스트 그리드 */}
         <div className="feature-cards-grid">
           {aiModels.map((model, index) => (
             <div
               key={index}
               className="feature-card"
-              onClick={() => model.path !== "#" && navigate(model.path)}
+              onClick={() => navigate(model.path)}
               style={{
-                cursor: model.path === "#" ? "default" : "pointer",
-                opacity: model.path === "#" ? 0.7 : 1,
-                borderColor:
-                  model.path === "#"
-                    ? "rgba(255,255,255,0.1)"
-                    : "rgba(251, 191, 36, 0.3)", // 카드 테두리도 은은한 골드
+                cursor: "pointer",
+                borderColor: "rgba(251, 191, 36, 0.3)",
               }}
             >
               <div
@@ -112,13 +142,11 @@ export default function AIPage() {
               >
                 {model.icon}
               </div>
-
-              {/* 🌟 수정된 부분: 텍스트를 노란색(Star Gold)으로 변경 */}
               <h3
                 className="feature-title"
                 style={{
-                  color: "#fbbf24", // 밝은 앰버(Amber/Gold) 색상
-                  textShadow: "0 0 10px rgba(251, 191, 36, 0.4)", // 별처럼 빛나는 효과 (Glow)
+                  color: "#fbbf24",
+                  textShadow: "0 0 10px rgba(251, 191, 36, 0.4)",
                   fontSize: "1.5rem",
                   fontWeight: "bold",
                   marginBottom: "10px",
@@ -126,7 +154,6 @@ export default function AIPage() {
               >
                 {model.title}
               </h3>
-
               <p className="feature-description" style={{ color: "#e5e7eb" }}>
                 {model.description}
               </p>
