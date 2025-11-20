@@ -1,29 +1,31 @@
 import React, { useState, useEffect } from "react";
 
 export default function WeatherWidget() {
-  const [weather, setWeather] = useState(null);
-  const [loading, setLoading] = useState(true);
+    const [weather, setWeather] = useState(null);
+    const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchWeather = async () => {
-      try {
-        const response = await fetch("http://localhost:8080/api/weather");
-        const result = await response.json();
-        if (result.success) {
-          setWeather(result.data);
-        }
-      } catch (error) {
-        console.error("날씨 로딩 에러:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
+    useEffect(() => {
+        const fetchWeather = async () => {
+            try {
+                // 🚨 서버 포트 8080 -> 3000으로 수정
+                const response = await fetch("http://localhost:3000/api/weather"); 
+                const result = await response.json();
+                if (result.success) {
+                    setWeather(result.data);
+                }
+            } catch (error) {
+                // 'Failed to fetch' 에러가 이 부분에서 발생했습니다. (포트 문제)
+                console.error("날씨 로딩 에러:", error); 
+            } finally {
+                setLoading(false);
+            }
+        };
 
-    fetchWeather();
-    // 10분마다 날씨 갱신
-    const interval = setInterval(fetchWeather, 600000);
-    return () => clearInterval(interval);
-  }, []);
+        fetchWeather();
+        // 10분마다 날씨 갱신
+        const interval = setInterval(fetchWeather, 600000);
+        return () => clearInterval(interval);
+    }, []);
 
   if (loading)
     return <div style={{ color: "#94a3b8" }}>날씨 로딩 중... 🌤️</div>;

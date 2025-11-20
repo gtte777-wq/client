@@ -9,10 +9,14 @@ export default function NewsList() {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterType, setFilterType] = useState("all");
 
+  // 🚨 서버 주소 (Server.js의 포트 3000과 일치)
+  const BASE_URL = "http://localhost:3000";
+
   useEffect(() => {
     const fetchNews = async () => {
       try {
-        const response = await fetch("http://localhost:8080/api/news");
+        // 🚨 포트 수정: 8080 -> 3000
+        const response = await fetch(`${BASE_URL}/api/news`);
         const result = await response.json();
         if (result.success) setNewsData(result.data);
       } catch (error) {
@@ -46,7 +50,6 @@ export default function NewsList() {
       <header className="news-header">
         <h1>📊 Global News Watch</h1>
         <div style={{ display: "flex", gap: "10px" }}>
-          {/* 🚨 [UX Patch] 뒤로 가기 추가 */}
           <button className="back-button" onClick={() => navigate(-1)}>
             ↩ 뒤로
           </button>
@@ -116,7 +119,8 @@ export default function NewsList() {
                 </div>
                 <h3 className="news-title">{news.title}</h3>
                 <p className="news-summary">
-                  {news.content.substring(0, 80)}...
+                    {/* content가 없을 경우를 대비한 안전 처리 */}
+                  {news.content ? news.content.substring(0, 80) : "내용 없음"}...
                 </p>
                 <div className="news-footer-tags">
                   <span className={`sentiment-badge ${news.sentiment}`}>
