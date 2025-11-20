@@ -17,12 +17,18 @@ export default function ProStockChart({ data }) {
         background: { type: ColorType.Solid, color: "transparent" },
         textColor: "#94a3b8",
       },
+      localization: {
+        priceFormatter: (price) => price.toLocaleString(), 
+    },
       grid: {
         vertLines: { color: "rgba(255, 255, 255, 0.1)" },
         horzLines: { color: "rgba(255, 255, 255, 0.1)" },
       },
       width: chartContainerRef.current.clientWidth,
       height: 500,
+      crosshair: {
+        mode: 1, // Magnet 모드 (데이터 포인트에 자석처럼 붙음) -> 0으로 하면 자유 이동
+    },
 
       // 1. 메인 캔들 차트 영역 설정 (화면 위쪽 70%만 쓰도록 제한)
       rightPriceScale: {
