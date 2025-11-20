@@ -1,57 +1,110 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "../../css/Home.css";
+import WeatherWidget from "../components/WeatherWidget";
 
 export default function Home() {
   const navigate = useNavigate();
+  const [currentTime, setCurrentTime] = useState(
+    new Date().toLocaleTimeString()
+  );
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime(new Date().toLocaleTimeString());
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
 
   const features = [
     {
-      icon: "🤖", // AI 아이콘
+      icon: "🤖",
       title: "AI Vision Lab",
-      description:
-        "머핀/치와와 분류, 농작물 병해충 진단 등 AI 이미지 분석을 체험합니다.",
-      path: "/ai", // AI 메뉴판으로 이동
-    },
-    {
-      icon: "📝",
-      title: "게시판",
-      description: "자유롭게 글을 작성하고 공유하는 공간입니다.",
-      path: "/board",
-    },
-    {
-      icon: "📰",
-      title: "뉴스 필터링",
-      description: "다양한 뉴스를 키워드로 검색하고 필터링합니다.",
-      path: "/news",
+      description: "이미지 분류, 병해충 진단, 인물 식별 등 AI 체험관",
+      path: "/ai",
     },
     {
       icon: "📈",
       title: "주식 차트",
-      description: "실시간 주가 흐름을 차트로 확인하고 분석합니다.",
+      description: "업비트 실시간 시세와 전문가용 캔들 차트 분석",
       path: "/stock",
+    },
+    {
+      icon: "📰",
+      title: "뉴스 필터링",
+      description: "실시간 글로벌 뉴스 수집 및 키워드 필터링",
+      path: "/news",
+    },
+    {
+      icon: "📝",
+      title: "게시판",
+      description: "자유롭게 글을 작성하고 소통하는 공간",
+      path: "/board",
     },
     {
       icon: "🧮",
       title: "계산기",
-      description: "간단한 사칙연산을 할 수 있는 계산기입니다.",
+      description: "계산 과정을 보여주는 우주 테마 계산기",
       path: "/calculator",
     },
     {
       icon: "📚",
       title: "프로젝트 소개",
-      description: "이 프로젝트의 개발 배경과 기술 스택을 확인합니다.",
+      description: "개발자 포트폴리오 및 기술 스택 아키텍처",
       path: "/about",
     },
   ];
 
   return (
     <div className="home-page-background">
-      <div className="home-content-container">
-        <h1 className="home-title">🌌 React Space Dashboard</h1>
-        <p className="home-subtitle">
-          AI 기술과 웹 개발의 만남, 다양한 기능을 탐험해보세요.
-        </p>
+      <div className="home-content-container" style={{ position: "relative" }}>
+        {/* 🌤️ 상단 정보창 (위치 수정됨) */}
+        <div
+          style={{
+            /* 🚨 수정: 위치를 오른쪽 끝에 딱 붙이지 않고 여유를 둠 */
+            position: "absolute",
+            top: "20px",
+            right: "20px",
+            display: "flex",
+            gap: "15px",
+            alignItems: "center",
+            zIndex: 10,
+            /* 모바일 등 화면이 작아질 때를 대비해 최대 너비 제한 */
+            maxWidth: "100%",
+            justifyContent: "flex-end",
+          }}
+        >
+          <WeatherWidget />
+
+          <div
+            style={{
+              color: "#fbbf24",
+              fontSize: "1.1rem",
+              fontWeight: "bold",
+              background: "rgba(0,0,0,0.6)",
+              padding: "10px 20px",
+              borderRadius: "20px",
+              border: "1px solid rgba(251, 191, 36, 0.3)",
+              backdropFilter: "blur(5px)",
+              display: "flex",
+              alignItems: "center",
+              boxShadow: "0 4px 15px rgba(0,0,0,0.2)",
+              minHeight: "54px",
+              whiteSpace: "nowrap",
+            }}
+          >
+            🕒 {currentTime}
+          </div>
+        </div>
+
+        {/* 🚨 수정: 제목을 아래로 100px 밀어서 위젯과 겹치지 않게 함 */}
+        <div style={{ marginTop: "100px" }}>
+          <h1 className="home-title">🌌 React Space Dashboard</h1>
+          <p className="home-subtitle">
+            AI 기술과 웹 개발의 만남, 다양한 기능을 탐험해보세요.
+          </p>
+        </div>
+
         <div className="feature-cards-grid">
           {features.map((feature, index) => (
             <div

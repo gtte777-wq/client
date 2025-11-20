@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import "../../css/Home.css"; // 우주 테마 스타일 사용
+import "../../css/Home.css";
+import { db } from "../firebase"; // 방금 만든 설정 파일
+import { collection, addDoc, serverTimestamp } from "firebase/firestore"; // DB 저장 도구
 
 export default function AIMuffinPage() {
   const navigate = useNavigate();
@@ -9,27 +11,23 @@ export default function AIMuffinPage() {
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  // 이미지 선택 핸들러
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
       setSelectedImage(file);
       setPreviewUrl(URL.createObjectURL(file));
-      setResult(null); // 이전 결과 초기화
+      setResult(null);
     }
   };
 
-  // 분석 요청 핸들러
   const handleSubmit = async () => {
     if (!selectedImage) return;
-
     setLoading(true);
     const formData = new FormData();
     formData.append("file", selectedImage);
-    formData.append("modelType", "muffin"); // 🚨 중요: Node.js에게 '머핀 모델 써!'라고 알려줌
+    formData.append("modelType", "muffin"); // 🚨 파이썬한테 보낼 이름
 
     try {
-      // Node.js 서버(8080)로 전송 -> Node가 Python(8000)으로 토스
       const response = await fetch("http://localhost:8080/api/ai-predict", {
         method: "POST",
         body: formData,
@@ -38,12 +36,23 @@ export default function AIMuffinPage() {
 
       if (data.success) {
         setResult(data.result);
+
+        // 👇 [저장 코드] 머핀용 이름표를 달아서 저장
+        try {
+          await addDoc(collection(db, "ai_history"), {
+            modelType: "머핀 vs 치와와", // 📝 기록실에 보여질 이름
+            label: data.result.label,
+            confidence: data.result.confidence,
+            timestamp: serverTimestamp(),
+          });
+        } catch (e) {
+          console.error("저장 실패", e);
+        }
       } else {
         alert("분석 실패: " + (data.message || data.error));
       }
     } catch (error) {
-      console.error("에러 발생:", error);
-      alert("서버 통신 에러");
+      alert("서버 에러");
     } finally {
       setLoading(false);
     }
@@ -52,7 +61,7 @@ export default function AIMuffinPage() {
   return (
     <div className="home-page-background">
       <div className="home-content-container" style={{ maxWidth: "600px" }}>
-        {/* 헤더 */}
+        {/* 헤더 & 뒤로가기 */}
         <div
           style={{
             display: "flex",
@@ -68,17 +77,18 @@ export default function AIMuffinPage() {
             🐶 머핀 vs 치와와
           </h1>
           <button
-            onClick={() => navigate("/ai")}
+            onClick={() => navigate(-1)}
             style={{
               padding: "8px 16px",
               borderRadius: "20px",
-              border: "1px solid rgba(255,255,255,0.2)",
-              background: "rgba(255,255,255,0.1)",
-              color: "white",
+              border: "1px solid rgba(251, 191, 36, 0.5)",
+              background: "rgba(0,0,0,0.5)",
+              color: "#fbbf24",
               cursor: "pointer",
+              fontWeight: "bold",
             }}
           >
-            ↩ 메뉴로
+            ↩ 뒤로 가기
           </button>
         </div>
 
@@ -88,11 +98,10 @@ export default function AIMuffinPage() {
             background: "rgba(255,255,255,0.05)",
             padding: "30px",
             borderRadius: "20px",
-            border: "1px solid rgba(255,255,255,0.1)",
+            border: "1px solid rgba(251, 191, 36, 0.3)",
             textAlign: "center",
           }}
         >
-          {/* 이미지 미리보기 */}
           <div
             style={{
               width: "100%",
@@ -104,7 +113,7 @@ export default function AIMuffinPage() {
               justifyContent: "center",
               overflow: "hidden",
               marginBottom: "20px",
-              border: "2px dashed rgba(255,255,255,0.2)",
+              border: "2px dashed rgba(251, 191, 36, 0.3)",
             }}
           >
             {previewUrl ? (
@@ -117,21 +126,19 @@ export default function AIMuffinPage() {
               <span style={{ color: "#9ca3af" }}>이미지를 선택해주세요</span>
             )}
           </div>
-
-          {/* 파일 선택 버튼 */}
           <input
             type="file"
             accept="image/*"
             onChange={handleImageChange}
             style={{ display: "none" }}
-            id="file-upload"
+            id="file-upload-muffin"
           />
           <label
-            htmlFor="file-upload"
+            htmlFor="file-upload-muffin"
             style={{
               display: "inline-block",
               padding: "10px 20px",
-              background: "#4b5563",
+              background: "#b45309",
               color: "white",
               borderRadius: "10px",
               cursor: "pointer",
@@ -140,8 +147,6 @@ export default function AIMuffinPage() {
           >
             📂 파일 찾기
           </label>
-
-          {/* 분석 시작 버튼 */}
           <button
             onClick={handleSubmit}
             disabled={!selectedImage || loading}
@@ -155,34 +160,30 @@ export default function AIMuffinPage() {
               borderRadius: "10px",
               cursor: loading ? "not-allowed" : "pointer",
               fontWeight: "bold",
-              fontSize: "1rem",
             }}
           >
-            {loading ? "분석 중... ⏳" : "🔍 AI 분석 시작"}
+            {loading ? "분석 중..." : "🔍 분석 시작"}
           </button>
         </div>
 
-        {/* 결과 표시 영역 */}
+        {/* 결과 */}
         {result && (
           <div
             style={{
               marginTop: "20px",
               padding: "20px",
-              background: "rgba(16, 185, 129, 0.2)",
-              border: "1px solid #10b981",
+              background: "rgba(251, 191, 36, 0.2)",
+              border: "1px solid #fbbf24",
               borderRadius: "15px",
-              animation: "fadeIn 0.5s",
             }}
           >
-            <h2 style={{ margin: "0 0 10px 0", color: "#34d399" }}>
+            <h2 style={{ margin: "0 0 10px 0", color: "#fbbf24" }}>
               🎉 분석 결과
             </h2>
             <p style={{ fontSize: "1.2rem", color: "white", margin: "5px 0" }}>
               이 사진은 <strong>{result.label}</strong> 입니다!
             </p>
-            <p style={{ color: "#d1d5db", margin: 0 }}>
-              정확도: {(result.confidence * 100).toFixed(1)}%
-            </p>
+            <p style={{ color: "#d1d5db" }}>확률: {result.confidence}%</p>
           </div>
         )}
       </div>

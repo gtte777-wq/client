@@ -1,10 +1,10 @@
-/* BoardList.css - Dark Space Glass Theme (Fixed) */
+/* BoardList.css - Dark Space Theme (Restored) */
 
 :root {
   --primary-color: #8b5cf6; /* 밝은 보라색 */
-  --text-main: #f9fafb;     /* 🚨 글씨를 흰색으로 변경 */
-  --text-sub: #cbd5e1;      /* 보조 글씨는 밝은 회색 */
-  --glass-dark: rgba(15, 23, 42, 0.85); /* 🌑 어두운 유리 배경 */
+  --text-main: #f9fafb; /* 흰색 글씨 (가독성) */
+  --text-sub: #cbd5e1; /* 연회색 글씨 */
+  --glass-dark: rgba(15, 23, 42, 0.85); /* 어두운 유리 배경 */
   --border-glass: rgba(255, 255, 255, 0.15);
 }
 
@@ -15,15 +15,15 @@
   background-size: cover;
   background-position: center center;
   background-attachment: fixed;
-  
+
   padding: 100px 20px 60px;
-  font-family: 'Pretendard', sans-serif;
+  font-family: "Pretendard", sans-serif;
   box-sizing: border-box;
-  
-  /* 중앙 정렬 보정 */
+
+  /* 중앙 정렬 */
   display: flex;
   flex-direction: column;
-  align-items: center; 
+  align-items: center;
 }
 
 /* 2. 헤더 */
@@ -33,7 +33,7 @@
   left: 0;
   width: 100%;
   height: 70px;
-  background-color: rgba(0, 0, 0, 0.7); /* 헤더 진하게 */
+  background-color: rgba(0, 0, 0, 0.7);
   backdrop-filter: blur(10px);
   border-bottom: 1px solid var(--border-glass);
   display: flex;
@@ -49,7 +49,7 @@
   font-weight: 800;
   color: #ffffff;
   margin: 0;
-  text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
 }
 
 .user-status {
@@ -60,10 +60,10 @@
   font-size: 0.85rem;
 }
 
-/* 3. 툴바 */
+/* 3. 툴바 (원래대로 복구) */
 .board-toolbar {
   width: 100%;
-  max-width: 900px; /* 리스트와 너비 맞춤 */
+  max-width: 900px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -80,24 +80,23 @@
 .search-box input {
   width: 100%;
   padding: 12px 20px;
-  /* 검색창도 어둡게 변경 */
   background-color: rgba(255, 255, 255, 0.15);
-  color: white; /* 입력 글씨 흰색 */
+  color: white;
   border: 1px solid var(--border-glass);
   border-radius: 50px;
   font-size: 0.95rem;
   outline: none;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.2);
   transition: all 0.2s;
-}
-
-.search-box input::placeholder {
-  color: #94a3b8;
 }
 
 .search-box input:focus {
   background-color: rgba(255, 255, 255, 0.25);
   border-color: var(--primary-color);
+}
+
+.toolbar-actions {
+  display: flex;
+  gap: 10px;
 }
 
 .btn {
@@ -113,7 +112,6 @@
 .btn-primary {
   background: linear-gradient(135deg, #7c3aed, #4c1d95);
   color: white;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
 }
 
 .btn-outline {
@@ -126,10 +124,10 @@
   background-color: rgba(255, 255, 255, 0.2);
 }
 
-/* 4. 게시글 카드 (다크 모드 변경) */
+/* 4. 게시글 카드 (다크 모드 적용) */
 .post-list-wrapper {
   width: 100%;
-  max-width: 900px; /* 너비 제한 */
+  max-width: 900px;
   display: flex;
   flex-direction: column;
   gap: 20px;
@@ -137,8 +135,7 @@
 
 .post-item-card {
   display: flex;
-  /* 🚨 배경을 흰색 -> 어두운 남색 유리로 변경 */
-  background: var(--glass-dark); 
+  background: var(--glass-dark); /* 어두운 배경으로 변경 */
   backdrop-filter: blur(10px);
   border: 1px solid var(--border-glass);
   border-radius: 16px;
@@ -152,7 +149,7 @@
 .post-item-card:hover {
   transform: translateY(-5px);
   box-shadow: 0 15px 40px rgba(0, 0, 0, 0.7);
-  border-color: var(--primary-color); /* 호버 시 테두리 보라색 */
+  border-color: var(--primary-color);
 }
 
 .post-content-area {
@@ -172,12 +169,11 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  text-shadow: 0 2px 4px rgba(0,0,0,0.5);
 }
 
 .post-preview {
   font-size: 0.95rem;
-  color: var(--text-sub); /* 밝은 회색 */
+  color: var(--text-sub);
   line-height: 1.6;
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -197,7 +193,7 @@
 /* 썸네일 */
 .post-thumbnail {
   width: 220px;
-  background-color: rgba(0,0,0,0.2); /* 썸네일 배경도 어둡게 */
+  background-color: rgba(0, 0, 0, 0.2);
   flex-shrink: 0;
   display: flex;
   align-items: center;
@@ -223,7 +219,7 @@
   font-weight: 700;
 }
 
-/* 상태 메시지 (로딩/없음) */
+/* 상태 메시지 */
 .status-message {
   text-align: center;
   padding: 80px 20px;
@@ -232,7 +228,6 @@
   background: var(--glass-dark);
   border-radius: 16px;
   border: 1px solid var(--border-glass);
-  backdrop-filter: blur(5px);
 }
 
 /* 모바일 대응 */

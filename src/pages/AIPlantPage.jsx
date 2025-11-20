@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../../css/Home.css";
+import { db } from "../firebase"; // 방금 만든 설정 파일
+import { collection, addDoc, serverTimestamp } from "firebase/firestore"; // DB 저장 도구
 
 export default function AIPlantPage() {
   const navigate = useNavigate();
@@ -23,7 +25,7 @@ export default function AIPlantPage() {
     setLoading(true);
     const formData = new FormData();
     formData.append("file", selectedImage);
-    formData.append("modelType", "plant"); // 🚨 'plant' 모델 요청
+    formData.append("modelType", "plant"); // 🚨 파이썬한테 보낼 이름
 
     try {
       const response = await fetch("http://localhost:8080/api/ai-predict", {
@@ -31,10 +33,26 @@ export default function AIPlantPage() {
         body: formData,
       });
       const data = await response.json();
-      if (data.success) setResult(data.result);
-      else alert("분석 실패: " + (data.message || data.error));
+
+      if (data.success) {
+        setResult(data.result);
+
+        // 👇 [저장 코드] 식물용 이름표
+        try {
+          await addDoc(collection(db, "ai_history"), {
+            modelType: "식물 병해충 진단", // 📝 기록실에 보여질 이름
+            label: data.result.label,
+            confidence: data.result.confidence,
+            timestamp: serverTimestamp(),
+          });
+        } catch (e) {
+          console.error("저장 실패", e);
+        }
+      } else {
+        alert("분석 실패: " + (data.message || data.error));
+      }
     } catch (error) {
-      alert("서버 통신 에러");
+      alert("서버 에러");
     } finally {
       setLoading(false);
     }
@@ -43,6 +61,7 @@ export default function AIPlantPage() {
   return (
     <div className="home-page-background">
       <div className="home-content-container" style={{ maxWidth: "600px" }}>
+        {/* 헤더 & 뒤로가기 */}
         <div
           style={{
             display: "flex",
@@ -53,29 +72,27 @@ export default function AIPlantPage() {
         >
           <h1
             className="home-title"
-            style={{
-              fontSize: "1.8rem",
-              color: "#a3e635",
-              textShadow: "0 0 10px rgba(163, 230, 53, 0.5)",
-            }}
+            style={{ fontSize: "1.8rem", color: "#a3e635", margin: 0 }}
           >
-            🌿 식물 병해충 종합 진단
+            🌿 식물 병해충 진단
           </h1>
           <button
-            onClick={() => navigate("/ai")}
+            onClick={() => navigate(-1)}
             style={{
               padding: "8px 16px",
               borderRadius: "20px",
-              border: "1px solid rgba(255,255,255,0.2)",
-              background: "rgba(255,255,255,0.1)",
-              color: "white",
+              border: "1px solid rgba(163, 230, 53, 0.5)",
+              background: "rgba(0,0,0,0.5)",
+              color: "#a3e635",
               cursor: "pointer",
+              fontWeight: "bold",
             }}
           >
-            ↩ 메뉴로
+            ↩ 뒤로 가기
           </button>
         </div>
 
+        {/* 업로드 영역 */}
         <div
           style={{
             background: "rgba(255,255,255,0.05)",
@@ -114,10 +131,10 @@ export default function AIPlantPage() {
             accept="image/*"
             onChange={handleImageChange}
             style={{ display: "none" }}
-            id="file-upload"
+            id="file-upload-plant"
           />
           <label
-            htmlFor="file-upload"
+            htmlFor="file-upload-plant"
             style={{
               display: "inline-block",
               padding: "10px 20px",
@@ -149,6 +166,7 @@ export default function AIPlantPage() {
           </button>
         </div>
 
+        {/* 결과 */}
         {result && (
           <div
             style={{
