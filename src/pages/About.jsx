@@ -11,7 +11,6 @@ export default function About() {
       <header className="about-header">
         <h1>About Me & Project</h1>
         <div style={{ display: "flex", gap: "10px" }}>
-          {/* 🚨 [UX Patch] 뒤로 가기 추가 */}
           <button className="back-button" onClick={() => navigate(-1)}>
             ↩ Back
           </button>
@@ -49,8 +48,9 @@ export default function About() {
             <li>CSS3 / Flexbox</li>
             <li>Node.js (Hono)</li>
             <li>RESTful API</li>
-            <li>RSS Parsing</li>
+            <li>HTML5 Canvas</li> {/* 게임 때문에 추가됨 */}
             <li>Python (FastAPI)</li>
+            <li>TensorFlow (LSTM)</li> {/* 주식 때문에 추가됨 */}
             <li>PyTorch (Deep Learning)</li>
             <li>InsightFace (ArcFace)</li>
             <li>FAISS (Vector Search)</li>
@@ -64,50 +64,77 @@ export default function About() {
           <ul
             style={{ paddingLeft: "20px", lineHeight: "1.8", color: "#cbd5e1" }}
           >
-            {/* ⭐ 오늘 추가된 게시판 기능 관련 항목 ⭐ */}
+            {/* 1. 마이크로서비스 아키텍처 (오늘의 하이라이트) */}
+            <li style={{ marginBottom: "20px" }}>
+              <strong style={{ color: "#a78bfa", fontSize: "1.1rem" }}>
+                🕸️ Microservices & AI Pipeline Integration
+              </strong>
+              <br />
+              <span>
+                Node.js를 **API Gateway**로, Python을 **AI Inference Server**로 분리하여 구축했습니다. 
+                FastAPI를 통해 5종의 AI 모델(주식, 얼굴, 사물 등)을 메모리에 상주시킴으로써 
+                **Cold Start 없는 초고속 응답 속도**를 구현했습니다.
+              </span>
+            </li>
+
+            {/* 2. 주식 AI 예측 */}
+            <li style={{ marginBottom: "20px" }}>
+              <strong style={{ color: "#f472b6", fontSize: "1.1rem" }}>
+                🔮 AI-Driven Stock Prediction
+              </strong>
+              <br />
+              <span>
+                **TensorFlow LSTM** 모델을 활용하여 과거 차트 데이터를 학습하고, 
+                뉴스 데이터의 감성 분석(Sentiment Analysis)을 결합하여 미래 주가를 예측하는 
+                하이브리드 분석 시스템을 개발했습니다.
+              </span>
+            </li>
+
+            {/* 3. 게시판 기능 */}
             <li style={{ marginBottom: "20px" }}>
               <strong style={{ color: "#34d399", fontSize: "1.1rem" }}>
                 📝 Full-Stack Forum/Board Implementation
               </strong>
               <br />
               <span>
-                **Firebase Firestore**를 활용하여 게시글의 **실시간
-                구독(onSnapshot)** 및 정렬 기능을 구현했습니다. **Context
-                API**를 통해 로그인 상태를 전역으로 관리하며, **Google OAuth**를
-                이용한 인증을 통해 사용자별 글쓰기 권한을 제어합니다.
+                **Firebase Firestore**를 활용하여 게시글의 **실시간 구독(onSnapshot)** 및 정렬 기능을 구현했습니다. 
+                **Context API**와 **Google OAuth**를 통해 사용자 인증 및 권한 관리를 처리합니다.
               </span>
             </li>
-            {/* ----------------------------------- */}
 
+            {/* 4. AI Vision Lab */}
             <li style={{ marginBottom: "20px" }}>
               <strong style={{ color: "#fbbf24", fontSize: "1.1rem" }}>
                 🤖 AI Vision Lab (End-to-End Pipeline)
               </strong>
               <br />
               <span>
-                Python **FastAPI** 서버를 구축하여 React와 연동했습니다.
-                EfficientNet-B0를 활용한 이미지 분류 및 InsightFace/FAISS 기반의
-                실시간 얼굴 식별 시스템을 구현했습니다.
+                EfficientNet-B0를 활용한 이미지 분류(병해충, 사물) 및 **InsightFace/FAISS** 기반의 
+                실시간 인물 신원 확인 시스템을 구축했습니다. Node.js가 이미지 전처리를 담당하고 Python이 추론을 수행합니다.
               </span>
             </li>
+
+            {/* 5. 웹 게임 (오늘 추가됨) */}
             <li style={{ marginBottom: "20px" }}>
+              <strong style={{ color: "#fbbf24", fontSize: "1.1rem" }}>
+                🎮 Interactive Web Game (Canvas API)
+              </strong>
+              <br />
+              <span>
+                React와 **HTML5 Canvas**를 활용하여 '뱀파이어 서바이벌' 스타일의 웹 게임을 직접 구현했습니다. 
+                충돌 감지, 오브젝트 풀링, 레벨업 시스템 등 게임 엔진의 핵심 로직을 최적화하여 설계했습니다.
+              </span>
+            </li>
+
+            {/* 6. 금융 데이터 */}
+            <li style={{ marginBottom: "10px" }}>
               <strong style={{ color: "#3b82f6", fontSize: "1.1rem" }}>
                 📈 Financial Data Visualization
               </strong>
               <br />
               <span>
-                **업비트(Upbit) 실시간 API**와 **Lightweight-charts**를 연동하여
-                1초 단위의 캔들 차트 및 거래량 분석 기능을 구현했습니다.
-              </span>
-            </li>
-            <li style={{ marginBottom: "10px" }}>
-              <strong style={{ color: "#34d399", fontSize: "1.1rem" }}>
-                📡 Real-time News Aggregator
-              </strong>
-              <br />
-              <span>
-                Node.js 백엔드에서 **RSS Parser**를 활용해 글로벌 뉴스 데이터를
-                실시간 수집 및 필터링합니다.
+                **업비트(Upbit) & 한국투자증권 API**와 **Lightweight-charts**를 연동하여 
+                실시간 시세 캔들 차트 및 자동매매 봇(Trading Bot) 기능을 구현했습니다.
               </span>
             </li>
           </ul>

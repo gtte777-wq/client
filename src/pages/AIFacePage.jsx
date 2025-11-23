@@ -28,7 +28,7 @@ export default function AIFacePage() {
     formData.append("modelType", "face"); // 🚨 파이썬한테 보낼 이름
 
     try {
-      const response = await fetch("http://localhost:8080/api/ai-predict", {
+      const response = await fetch("http://localhost:3000/api/ai/face", {
         method: "POST",
         body: formData,
       });

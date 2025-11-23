@@ -28,7 +28,7 @@ export default function AIPlantPage() {
     formData.append("modelType", "plant"); // 🚨 파이썬한테 보낼 이름
 
     try {
-      const response = await fetch("http://localhost:8080/api/ai-predict", {
+      const response = await fetch("http://localhost:3000/api/ai/plant", {
         method: "POST",
         body: formData,
       });

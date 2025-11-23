@@ -14,23 +14,24 @@ import AIPlantPage from "./pages/AIPlantPage.jsx";
 import AIRicePage from "./pages/AIRicePage.jsx";
 import AIFacePage from "./pages/AIFacePage.jsx";
 import AIHistoryPage from "./pages/AIHistoryPage.jsx";
+import StockPredictPage from './pages/StockPredictPage';
+import GamePage from './pages/GamePage';
 
 export default function App() {
   return (
     <Routes>
-      <Route path="/" element={<Profile />} /> {/* 첫 화면을 Profile로 설정 */}
+      <Route path="/" element={<Profile />} />
       <Route path="/home" element={<Home />} />{" "}
       {/* /home 경로를 대시보드로 설정 */}
       <Route path="/board" element={<BoardList />} />
       <Route path="/write" element={<MemoUpsert />} />{" "}
-      {/* '/write' 경로를 MemoUpsert 컴포넌트로 연결 */}
       <Route path="/news" element={<NewsList />} />
       <Route path="/stock" element={<StockChartPage />} />{" "}
       <Route path="/about" element={<About />} />
       <Route path="/detail/:postId" element={<MemoDetail />} />{" "}
-      {/* 상세 페이지 경로 추가 */}
       <Route path="/calculator" element={<CalculatorPage />} />{" "}
-      {/* /calculator 경로 추가 */}
+      <Route path="/predict" element={<StockPredictPage />} />
+      <Route path="/game" element={<GamePage />} />
       <Route path="*" element={<Profile />} />{" "}
       {/* 일치하는 경로가 없으면 첫 화면으로 */}
       <Route path="/ai" element={<AIPage />} />
